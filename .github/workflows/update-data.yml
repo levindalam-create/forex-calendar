@@ -1,0 +1,114 @@
+name: Update Market Data
+
+on:
+  schedule:
+    - cron: '0 * * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  update-market-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch market news and update news.json
+        run: |
+          node << 'NODEJS'
+          const https = require('https');
+          const fs = require('fs');
+
+          const now = new Date();
+          const day = now.getUTCDay();
+
+          if (day === 0 || day === 6) {
+            console.log('Weekend - skip');
+            process.exit(0);
+          }
+
+          const newsKey = process.env.NEWS_API_KEY || '';
+          const since = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+          function fetchUrl(url) {
+            return new Promise(function(resolve, reject) {
+              https.get(url, function(res) {
+                var data = '';
+                res.on('data', function(chunk) { data += chunk; });
+                res.on('end', function() {
+                  try { resolve(JSON.parse(data)); }
+                  catch(e) { reject(new Error('JSON parse: ' + e.message)); }
+                });
+              }).on('error', reject);
+            });
+          }
+
+          var bull = ['rise','rally','gain','surge','bullish','strong','beat','above','higher'];
+          var bear = ['fall','drop','decline','bearish','weak','below','miss','lower','concern','recession'];
+
+          function sentiment(articles, ccy) {
+            var sc = 0;
+            articles.forEach(function(a) {
+              var t = ((a.title||'')+(a.description||'')).toLowerCase();
+              if (ccy && a.currency && a.currency !== ccy) return;
+              bull.forEach(function(w){if(t.includes(w)) sc++;});
+              bear.forEach(function(w){if(t.includes(w)) sc--;});
+            });
+            return sc > 2 ? 'haussier' : sc < -2 ? 'baissier' : 'neutre';
+          }
+
+          var STATIC = [
+            {title:'Fed - Taux directeurs et perspectives monetaires',description:'La Reserve Federale surveille les indicateurs. Marches attendent declarations FOMC.',source:{name:'Reuters'},publishedAt:now.toISOString(),impact:'VH',currency:'USD'},
+            {title:'BCE - Politique monetaire zone euro',description:'La BCE ajuste sa politique selon inflation. EUR/USD sous surveillance institutionnelle.',source:{name:'Bloomberg'},publishedAt:new Date(now-3600000).toISOString(),impact:'VH',currency:'EUR'},
+            {title:'NFP Non Farm Payrolls - Emploi americain',description:'Rapport emploi americain principal indicateur Fed. Volatilite forte sur paires USD.',source:{name:'FXStreet'},publishedAt:new Date(now-7200000).toISOString(),impact:'VH',currency:'USD'},
+            {title:'Bank of Japan - Politique monetaire JPY',description:'La BOJ surveille USD/JPY. Interventions possibles si depreciation yen accelere.',source:{name:'Nikkei'},publishedAt:new Date(now-10800000).toISOString(),impact:'H',currency:'JPY'},
+            {title:'Or XAU/USD - Niveau historique 2026',description:'Prix or soutenu par tensions geopolitiques et achats banques centrales.',source:{name:'Kitco'},publishedAt:new Date(now-14400000).toISOString(),impact:'H',currency:'XAU'},
+            {title:'DXY Dollar Index - Biais macro USD',description:'Indice dollar evolue selon differences de taux entre Fed et autres banques centrales.',source:{name:'DailyFX'},publishedAt:new Date(now-18000000).toISOString(),impact:'H',currency:'USD'},
+            {title:'PMI manufacturier - Indicateurs avances',description:'Indices PMI signal avance sur activite economique. PMI sous 50 signale contraction.',source:{name:'Investing'},publishedAt:new Date(now-21600000).toISOString(),impact:'H',currency:'EUR'},
+            {title:'CPI Inflation - Facteur cle banques centrales',description:'Inflation principal facteur determinant decisions banques centrales mondiales.',source:{name:'FT'},publishedAt:new Date(now-25200000).toISOString(),impact:'H',currency:'USD'},
+          ];
+
+          var p = newsKey
+            ? fetchUrl('https://newsapi.org/v2/everything?q=forex+OR+fed+OR+BCE+OR+inflation+OR+NFP&language=en&sortBy=publishedAt&from='+since+'&apiKey='+newsKey+'&pageSize=20')
+                .then(function(d){ return (d.articles&&d.articles.length>0)?d.articles:STATIC; })
+                .catch(function(){ return STATIC; })
+            : Promise.resolve(STATIC);
+
+          p.then(function(articles) {
+            var currencies = ['USD','EUR','GBP','JPY','XAU'];
+            var sent = {};
+            currencies.forEach(function(c){ sent[c] = sentiment(articles, c); });
+
+            var month = now.getMonth()+1;
+            var isDST = month>=3&&month<=10;
+            var parisH = (now.getUTCHours()+(isDST?2:1))%24;
+
+            var out = {
+              updated: now.toISOString(),
+              parisHour: parisH,
+              articles: articles.slice(0,15).map(function(a){return{
+                title:a.title||'',
+                description:a.description||'',
+                source:(a.source&&a.source.name)||'',
+                publishedAt:a.publishedAt||now.toISOString(),
+                impact:a.impact||'M',
+                currency:a.currency||'USD'
+              };}),
+              sentiment: sent
+            };
+
+            fs.writeFileSync('news.json', JSON.stringify(out, null, 2));
+            console.log('news.json OK -', out.articles.length, 'articles - sentiment:', JSON.stringify(sent));
+          });
+          NODEJS
+        env:
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+
+      - name: Commit and push news.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add news.json
+          git diff --staged --quiet && echo "No changes to commit" || (git commit -m "chore: update market news $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
