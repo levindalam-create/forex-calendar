@@ -1,0 +1,13 @@
+{
+  "updated": "2026-03-15T17:34:09.153Z",
+  "parisHour": 19,
+  "weekend": true,
+  "articles": [],
+  "sentiment": {
+    "USD": "neutre",
+    "EUR": "neutre",
+    "GBP": "neutre",
+    "JPY": "neutre",
+    "XAU": "neutre"
+  }
+}
