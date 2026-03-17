@@ -1,13 +1,13 @@
 {
-  "updated": "2026-03-17T08:06:39.930Z",
-  "parisHour": 10,
+  "updated": "2026-03-17T11:33:26.079Z",
+  "parisHour": 13,
   "weekend": false,
   "articles": [
     {
       "title": "Fed taux directeurs - Perspectives monetaires",
       "description": "Reserve Federale surveille indicateurs economiques. Marches attendent declarations FOMC.",
       "source": "Reuters",
-      "publishedAt": "2026-03-17T08:06:39.930Z",
+      "publishedAt": "2026-03-17T11:33:26.079Z",
       "impact": "VH",
       "currency": "USD"
     },
@@ -15,7 +15,7 @@
       "title": "BCE politique monetaire zone euro",
       "description": "BCE ajuste politique selon donnees inflation. EUR/USD sous surveillance institutionnelle.",
       "source": "Bloomberg",
-      "publishedAt": "2026-03-17T07:06:39.930Z",
+      "publishedAt": "2026-03-17T10:33:26.079Z",
       "impact": "VH",
       "currency": "EUR"
     },
@@ -23,7 +23,7 @@
       "title": "NFP Non Farm Payrolls emploi americain",
       "description": "Rapport emploi americain principal indicateur Fed. Fort impact sur paires USD.",
       "source": "FXStreet",
-      "publishedAt": "2026-03-17T06:06:39.930Z",
+      "publishedAt": "2026-03-17T09:33:26.079Z",
       "impact": "VH",
       "currency": "USD"
     },
@@ -31,7 +31,7 @@
       "title": "Bank of Japan politique monetaire yen",
       "description": "BOJ surveille USD/JPY. Interventions possibles si depreciation yen accelere.",
       "source": "Nikkei",
-      "publishedAt": "2026-03-17T05:06:39.930Z",
+      "publishedAt": "2026-03-17T08:33:26.079Z",
       "impact": "H",
       "currency": "JPY"
     },
@@ -39,7 +39,7 @@
       "title": "Or XAU/USD niveau historique 2026",
       "description": "Prix or soutenu par tensions geopolitiques et achats banques centrales.",
       "source": "Kitco",
-      "publishedAt": "2026-03-17T04:06:39.930Z",
+      "publishedAt": "2026-03-17T07:33:26.079Z",
       "impact": "H",
       "currency": "XAU"
     },
@@ -47,7 +47,7 @@
       "title": "DXY Dollar Index biais macro USD",
       "description": "Indice dollar evolue selon differences de taux Fed et autres banques centrales.",
       "source": "DailyFX",
-      "publishedAt": "2026-03-17T03:06:39.930Z",
+      "publishedAt": "2026-03-17T06:33:26.079Z",
       "impact": "H",
       "currency": "USD"
     },
@@ -55,7 +55,7 @@
       "title": "PMI manufacturier indicateurs avances",
       "description": "PMI signal avance activite economique. Valeur sous 50 signale contraction.",
       "source": "Investing",
-      "publishedAt": "2026-03-17T02:06:39.930Z",
+      "publishedAt": "2026-03-17T05:33:26.079Z",
       "impact": "H",
       "currency": "EUR"
     },
@@ -63,7 +63,7 @@
       "title": "CPI inflation facteur cle banques centrales",
       "description": "Inflation reste principal facteur determinant decisions taux directeurs mondiaux.",
       "source": "FT",
-      "publishedAt": "2026-03-17T01:06:39.930Z",
+      "publishedAt": "2026-03-17T04:33:26.079Z",
       "impact": "H",
       "currency": "USD"
     }
