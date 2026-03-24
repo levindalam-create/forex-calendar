@@ -1,0 +1,403 @@
+name: Update Market Data
+
+on:
+  schedule:
+    # Toutes les 15 min lundi-vendredi 7h-22h UTC (couvre London + NY)
+    - cron: '0,15,30,45 7-21 * * 1-5'
+  workflow_dispatch: # Déclenchement manuel possible
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch all market data
+        run: |
+          cat > /tmp/fetch_data.js << 'NODEJS'
+          const https = require('https');
+          const fs = require('fs');
+
+          const TD_KEY   = process.env.TD_KEY   || '6d917abe390a4491801e0bacc78b9006';
+          const AV_KEY   = process.env.AV_KEY   || '66VWX9UM4I5IGEK2';
+          const NEWS_KEY = process.env.NEWS_KEY  || '388fa2f196244bd4b3e12912e1b6d350';
+
+          // ── CONFIG ──
+          const PAIRS = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','XAU/USD','AUD/USD','USD/CAD','USD/CHF'];
+          const TF    = ['15min','1h','4h','1day'];
+
+          const TF_MAP = { '15min':'M15', '1h':'H1', '4h':'H4', '1day':'D1' };
+          const OUTPUT_SIZE = { '15min':96, '1h':48, '4h':60, '1day':90 };
+
+          function get(url) {
+            return new Promise((resolve, reject) => {
+              const req = https.get(url, { timeout: 15000 }, res => {
+                let d = '';
+                res.on('data', c => d += c);
+                res.on('end', () => {
+                  try { resolve(JSON.parse(d)); }
+                  catch(e) { reject(new Error('JSON parse error: ' + e.message)); }
+                });
+              });
+              req.on('error', reject);
+              req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+            });
+          }
+
+          function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+          // ── TWELVE DATA FETCH ──
+          async function fetchTD(symbol, interval) {
+            const size = OUTPUT_SIZE[interval] || 60;
+            const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${size}&timezone=UTC&apikey=${TD_KEY}`;
+            try {
+              const data = await get(url);
+              if (!data || !data.values || data.values.length === 0) return null;
+              if (data.code === 429 || (data.message && /limit|quota|exceed/i.test(data.message))) {
+                console.log(`TD quota hit for ${symbol} ${interval}`);
+                return null;
+              }
+              // Twelve Data retourne du plus récent au plus ancien — on inverse
+              const vals = data.values.slice().reverse();
+              const opens=[], highs=[], lows=[], closes=[], timestamps=[];
+              for (const v of vals) {
+                const o=parseFloat(v.open), h=parseFloat(v.high), l=parseFloat(v.low), c=parseFloat(v.close);
+                if (isNaN(o)||isNaN(h)||isNaN(l)||isNaN(c)) continue;
+                opens.push(o); highs.push(h); lows.push(l); closes.push(c);
+                timestamps.push(v.datetime);
+              }
+              if (closes.length < 5) return null;
+              return { opens, highs, lows, closes, timestamps, source: 'Twelve Data', real: true };
+            } catch(e) {
+              console.warn(`TD error ${symbol} ${interval}: ${e.message}`);
+              return null;
+            }
+          }
+
+          // ── ALPHA VANTAGE FALLBACK ──
+          async function fetchAV(symbol, interval) {
+            const sym = symbol.replace('/', '');
+            const from = sym.slice(0, 3);
+            const to   = sym.slice(3, 6);
+            const avInterval = { '15min':'15min','1h':'60min','4h':'60min','1day':null }[interval];
+            const func = interval === '1day' ? 'FX_DAILY' : 'FX_INTRADAY';
+            const fromSym = symbol === 'XAU/USD' ? 'XAU' : from;
+            const toSym   = symbol === 'XAU/USD' ? 'USD' : to;
+            const url = `https://www.alphavantage.co/query?function=${func}&from_symbol=${fromSym}&to_symbol=${toSym}${avInterval?'&interval='+avInterval:''}&outputsize=compact&apikey=${AV_KEY}`;
+            try {
+              const data = await get(url);
+              if (!data || data['Note'] || data['Information'] || data['Error Message']) return null;
+              const tsKey = Object.keys(data).find(k => k.includes('Time Series'));
+              if (!tsKey) return null;
+              const entries = Object.keys(data[tsKey]).sort();
+              const opens=[], highs=[], lows=[], closes=[], timestamps=[];
+              for (const k of entries) {
+                const b = data[tsKey][k];
+                opens.push(parseFloat(b['1. open']));
+                highs.push(parseFloat(b['2. high']));
+                lows.push(parseFloat(b['3. low']));
+                closes.push(parseFloat(b['4. close']));
+                timestamps.push(k);
+              }
+              if (closes.length < 5) return null;
+              return { opens, highs, lows, closes, timestamps, source: 'Alpha Vantage', real: true };
+            } catch(e) {
+              console.warn(`AV error ${symbol} ${interval}: ${e.message}`);
+              return null;
+            }
+          }
+
+          // ── NEWS FETCH ──
+          async function fetchNews() {
+            const since = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            const url = `https://newsapi.org/v2/everything?q=forex+OR+fed+OR+ECB+OR+inflation+OR+NFP+OR+dollar&language=en&sortBy=publishedAt&from=${since}&pageSize=20&apiKey=${NEWS_KEY}`;
+            try {
+              const data = await get(url);
+              if (!data || !data.articles) return null;
+              const bull = ['rise','rally','gain','surge','bullish','strong','beat','above','higher','hawkish'];
+              const bear = ['fall','drop','decline','bearish','weak','below','miss','lower','concern','dovish'];
+              function getSent(articles, ccy) {
+                let sc = 0;
+                for (const a of articles) {
+                  const t = ((a.title||'')+(a.description||'')).toLowerCase();
+                  if (ccy && a.currency && a.currency !== ccy) continue;
+                  bull.forEach(w => { if(t.includes(w)) sc++; });
+                  bear.forEach(w => { if(t.includes(w)) sc--; });
+                }
+                return sc > 2 ? 'haussier' : sc < -2 ? 'baissier' : 'neutre';
+              }
+              function getImpact(text) {
+                const t = text.toLowerCase();
+                if (/fed|fomc|nfp|ecb|bce|rate decision|boj|cpi|central bank/i.test(t)) return 'VH';
+                if (/pmi|ism|retail sales|gdp|payroll|jobless/i.test(t)) return 'H';
+                return 'M';
+              }
+              function getCcy(text) {
+                const t = text.toLowerCase();
+                if (/eur|euro|ecb|lagarde/i.test(t)) return 'EUR';
+                if (/gbp|pound|boe|bailey/i.test(t)) return 'GBP';
+                if (/jpy|yen|boj|ueda/i.test(t)) return 'JPY';
+                if (/gold|xau|bullion/i.test(t)) return 'XAU';
+                return 'USD';
+              }
+              const articles = data.articles.map(a => ({
+                title: a.title || '',
+                description: a.description || '',
+                source: (a.source && a.source.name) || 'NewsAPI',
+                publishedAt: a.publishedAt || new Date().toISOString(),
+                impact: getImpact((a.title||'')+(a.description||'')),
+                currency: getCcy((a.title||'')+(a.description||''))
+              }));
+              const sentiment = {};
+              ['USD','EUR','GBP','JPY','XAU'].forEach(c => { sentiment[c] = getSent(articles, c); });
+              return { articles, sentiment };
+            } catch(e) {
+              console.warn('News error:', e.message);
+              return null;
+            }
+          }
+
+          // ── COT DATA (CFTC officiel — publié chaque vendredi) ──
+          async function fetchCOT() {
+            // CFTC publie les données COT en CSV public
+            // On utilise l'API Quandl/Nasdaq gratuite pour le COT forex
+            const cotData = {
+              updated: new Date().toISOString(),
+              // Données COT CFTC réelles — Net positions (Large Speculators)
+              // Source: CFTC Commitments of Traders report
+              pairs: {}
+            };
+
+            const cotSymbols = [
+              { sym: 'EURUSD', quandl: '098662' }, // EUR
+              { sym: 'GBPUSD', quandl: '096742' }, // GBP
+              { sym: 'USDJPY', quandl: '097741' }, // JPY
+              { sym: 'AUDUSD', quandl: '232741' }, // AUD
+              { sym: 'USDCAD', quandl: '090741' }, // CAD
+              { sym: 'USDCHF', quandl: '092741' }, // CHF
+              { sym: 'XAUUSD', quandl: '088691' }, // Gold
+            ];
+
+            for (const item of cotSymbols) {
+              try {
+                // API CFTC via Quandl (gratuit sans clé pour données COT)
+                const url = `https://data.nasdaq.com/api/v3/datasets/CFTC/${item.quandl}_FO_ALL.json?rows=2`;
+                const data = await get(url);
+                if (data && data.dataset && data.dataset.data && data.dataset.data.length > 0) {
+                  const latest = data.dataset.data[0];
+                  const prev   = data.dataset.data[1] || latest;
+                  // Colonnes COT: date, open_interest, noncomm_long, noncomm_short, ...
+                  const netLong  = (latest[5] || 0) - (latest[6] || 0); // NonComm Long - Short
+                  const prevNet  = (prev[5]   || 0) - (prev[6]   || 0);
+                  const change   = netLong - prevNet;
+                  cotData.pairs[item.sym] = {
+                    netPosition: Math.round(netLong),
+                    change: Math.round(change),
+                    direction: netLong > 5000 ? 'haussier' : netLong < -5000 ? 'baissier' : 'neutre',
+                    momentum: change > 2000 ? 'renforcement' : change < -2000 ? 'affaiblissement' : 'stable',
+                    date: latest[0],
+                    source: 'CFTC COT réel'
+                  };
+                  await sleep(300);
+                }
+              } catch(e) {
+                console.warn(`COT error ${item.sym}: ${e.message}`);
+                // Fallback valeurs statiques si CFTC indisponible
+                cotData.pairs[item.sym] = {
+                  netPosition: 0, change: 0,
+                  direction: 'neutre', momentum: 'stable',
+                  source: 'CFTC indisponible'
+                };
+              }
+            }
+            return cotData;
+          }
+
+          // ── SPOT PRICES ──
+          async function fetchSpots() {
+            const spots = {};
+            const pairs = ['eur','gbp','usd','jpy','aud','cad','chf'];
+            try {
+              const data = await get('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+              if (data && data.usd) {
+                spots['EURUSD'] = data.usd['eur'] ? +(1/data.usd['eur']).toFixed(5) : null;
+                spots['GBPUSD'] = data.usd['gbp'] ? +(1/data.usd['gbp']).toFixed(5) : null;
+                spots['USDJPY'] = data.usd['jpy'] ? +data.usd['jpy'].toFixed(3) : null;
+                spots['AUDUSD'] = data.usd['aud'] ? +(1/data.usd['aud']).toFixed(5) : null;
+                spots['USDCAD'] = data.usd['cad'] ? +data.usd['cad'].toFixed(5) : null;
+                spots['USDCHF'] = data.usd['chf'] ? +data.usd['chf'].toFixed(5) : null;
+                spots['EURGBP'] = (spots['EURUSD'] && spots['GBPUSD'])
+                  ? +(spots['EURUSD']/spots['GBPUSD']).toFixed(5) : null;
+                spots['GBPJPY'] = (spots['GBPUSD'] && spots['USDJPY'])
+                  ? +(spots['GBPUSD']*spots['USDJPY']).toFixed(3) : null;
+              }
+            } catch(e) { console.warn('Spot price error:', e.message); }
+            // XAU
+            try {
+              const xauData = await get('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/xau.json');
+              if (xauData && xauData.xau && xauData.xau.usd) {
+                spots['XAUUSD'] = +xauData.xau.usd.toFixed(2);
+              }
+            } catch(e) {}
+            return spots;
+          }
+
+          // ── MAIN ──
+          async function main() {
+            console.log('=== FX PRO Data Fetch ===', new Date().toISOString());
+
+            const now    = new Date();
+            const day    = now.getUTCDay();
+            const hour   = now.getUTCHours();
+            const isWeekend = day === 0 || day === 6;
+
+            // Déterminer heure Paris
+            const month    = now.getUTCMonth() + 1;
+            const isDST    = month >= 3 && month <= 10;
+            const parisHour = (hour + (isDST ? 2 : 1)) % 24;
+
+            // ── SPOTS (toujours) ──
+            console.log('Fetching spot prices...');
+            const spots = await fetchSpots();
+            console.log('Spots:', JSON.stringify(spots));
+
+            // ── NEWS (toujours) ──
+            console.log('Fetching news...');
+            const newsData = await fetchNews();
+
+            // ── COT (une fois par jour le vendredi ou si manquant) ──
+            let cotData = null;
+            const cotFile = 'cot.json';
+            let cotNeedsUpdate = true;
+            if (fs.existsSync(cotFile)) {
+              try {
+                const existing = JSON.parse(fs.readFileSync(cotFile, 'utf8'));
+                const age = Date.now() - new Date(existing.updated).getTime();
+                if (age < 7 * 86400000) cotNeedsUpdate = false; // moins d'une semaine
+              } catch(e) {}
+            }
+            if (cotNeedsUpdate || day === 5) {
+              console.log('Fetching COT data...');
+              cotData = await fetchCOT();
+            }
+
+            // ── OHLC (uniquement en heures de marché) ──
+            const ohlcData = {};
+            if (!isWeekend) {
+              // Priorité TF selon heure: toujours M15 + H1, H4 + D1 moins souvent
+              const minute = now.getUTCMinutes();
+              const fetchD1 = minute === 0;     // seulement à H:00
+              const fetchH4 = minute === 0 || minute === 30; // à H:00 et H:30
+
+              const pairsToFetch = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','XAU/USD','AUD/USD'];
+              let reqCount = 0;
+              const REQ_LIMIT = 25; // Conservative pour rester dans quota gratuit
+
+              for (const pair of pairsToFetch) {
+                const sym = pair.replace('/','');
+                ohlcData[sym] = {};
+
+                for (const tf of TF) {
+                  // Skip D1 et H4 si pas le bon moment
+                  if (tf === '1day' && !fetchD1) continue;
+                  if (tf === '4h'   && !fetchH4)  continue;
+                  if (reqCount >= REQ_LIMIT) {
+                    console.log(`Request limit reached (${REQ_LIMIT}), skipping remaining`);
+                    break;
+                  }
+
+                  console.log(`Fetching ${pair} ${tf}...`);
+                  let candles = await fetchTD(pair, tf);
+                  reqCount++;
+                  await sleep(500); // Respecter rate limit TD
+
+                  // Fallback AV si TD échoue
+                  if (!candles) {
+                    console.log(`TD failed, trying AV for ${pair} ${tf}...`);
+                    candles = await fetchAV(pair, tf);
+                    await sleep(13000); // AV: 5 req/min max
+                  }
+
+                  if (candles) {
+                    // Ancrer dernière bougie sur prix spot réel
+                    const spotPrice = spots[sym];
+                    if (spotPrice && !isNaN(spotPrice)) {
+                      const last = candles.closes.length - 1;
+                      candles.closes[last] = spotPrice;
+                      candles.highs[last]  = Math.max(candles.highs[last], spotPrice);
+                      candles.lows[last]   = Math.min(candles.lows[last], spotPrice);
+                    }
+                    ohlcData[sym][TF_MAP[tf]] = {
+                      ...candles,
+                      fetchedAt: new Date().toISOString()
+                    };
+                    console.log(`✓ ${sym} ${tf}: ${candles.closes.length} candles (${candles.source})`);
+                  } else {
+                    console.warn(`✗ ${sym} ${tf}: no data`);
+                  }
+                }
+                if (reqCount >= REQ_LIMIT) break;
+              }
+            } else {
+              console.log('Weekend — skipping OHLC fetch');
+            }
+
+            // ── ÉCRIRE LES FICHIERS ──
+            const meta = {
+              updated:    new Date().toISOString(),
+              parisHour,
+              weekend:    isWeekend,
+              marketOpen: !isWeekend && hour >= 0 && hour < 22,
+              spots,
+              fetchStats: {
+                ohlcPairs:  Object.keys(ohlcData).length,
+                newsCount:  newsData ? newsData.articles.length : 0,
+                cotUpdated: !!cotData
+              }
+            };
+
+            fs.writeFileSync('meta.json',    JSON.stringify(meta,    null, 2));
+            fs.writeFileSync('ohlc.json',    JSON.stringify(ohlcData, null, 2));
+            if (newsData) fs.writeFileSync('news.json', JSON.stringify(newsData, null, 2));
+            if (cotData)  fs.writeFileSync('cot.json',  JSON.stringify(cotData,  null, 2));
+
+            console.log('✅ Files written:');
+            console.log('  meta.json —', JSON.stringify(meta.fetchStats));
+            console.log('  ohlc.json —', Object.keys(ohlcData).length, 'pairs');
+            if (newsData) console.log('  news.json —', newsData.articles.length, 'articles');
+            if (cotData)  console.log('  cot.json  — COT updated');
+          }
+
+          main().catch(e => { console.error('Fatal:', e); process.exit(1); });
+          NODEJS
+          node /tmp/fetch_data.js
+        env:
+          TD_KEY:   ${{ secrets.TD_KEY }}
+          AV_KEY:   ${{ secrets.AV_KEY }}
+          NEWS_KEY: ${{ secrets.NEWS_KEY }}
+
+      - name: Commit and push data files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add meta.json ohlc.json news.json cot.json 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "data: update $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
