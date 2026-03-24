@@ -2,12 +2,14 @@ name: Update Market Data
 
 on:
   schedule:
-    # Toutes les 15 min lundi-vendredi 7h-22h UTC (couvre London + NY)
     - cron: '0,15,30,45 7-21 * * 1-5'
-  workflow_dispatch: # Déclenchement manuel possible
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   update-data:
@@ -24,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Fetch all market data
         run: |
@@ -123,10 +125,21 @@ jobs:
 
           // ── NEWS FETCH ──
           async function fetchNews() {
+            // NewsAPI fonctionne côté serveur (pas de CORS ici)
             const since = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            const url = `https://newsapi.org/v2/everything?q=forex+OR+fed+OR+ECB+OR+inflation+OR+NFP+OR+dollar&language=en&sortBy=publishedAt&from=${since}&pageSize=20&apiKey=${NEWS_KEY}`;
+            // Essaie plusieurs endpoints NewsAPI
+            const urls = [
+              `https://newsapi.org/v2/everything?q=forex+OR+fed+OR+ECB+OR+inflation+OR+NFP+OR+dollar&language=en&sortBy=publishedAt&from=${since}&pageSize=20&apiKey=${NEWS_KEY}`,
+              `https://newsapi.org/v2/top-headlines?category=business&language=en&pageSize=20&apiKey=${NEWS_KEY}`
+            ];
+            let data = null;
+            for (const url of urls) {
+              try {
+                const d = await get(url);
+                if (d && d.articles && d.articles.length > 0) { data = d; break; }
+              } catch(e) { console.warn('NewsAPI attempt failed:', e.message); }
+            }
             try {
-              const data = await get(url);
               if (!data || !data.articles) return null;
               const bull = ['rise','rally','gain','surge','bullish','strong','beat','above','higher','hawkish'];
               const bear = ['fall','drop','decline','bearish','weak','below','miss','lower','concern','dovish'];
@@ -171,57 +184,91 @@ jobs:
             }
           }
 
-          // ── COT DATA (CFTC officiel — publié chaque vendredi) ──
+          // ── COT DATA — CFTC direct CSV (source officielle) ──
           async function fetchCOT() {
-            // CFTC publie les données COT en CSV public
-            // On utilise l'API Quandl/Nasdaq gratuite pour le COT forex
-            const cotData = {
-              updated: new Date().toISOString(),
-              // Données COT CFTC réelles — Net positions (Large Speculators)
-              // Source: CFTC Commitments of Traders report
-              pairs: {}
+            const cotData = { updated: new Date().toISOString(), pairs: {} };
+
+            // CFTC publie le rapport COT en CSV chaque vendredi
+            // URL officielle du dernier rapport Futures Only
+            const cotUrl = 'https://www.cftc.gov/dea/newcot/f_disagg.txt';
+
+            // Map des codes CFTC pour chaque devise (Market and Exchange Names)
+            const COT_CODES = {
+              'EURUSD': 'EURO FX',
+              'GBPUSD': 'BRITISH POUND',
+              'USDJPY': 'JAPANESE YEN',
+              'AUDUSD': 'AUSTRALIAN DOLLAR',
+              'USDCAD': 'CANADIAN DOLLAR',
+              'USDCHF': 'SWISS FRANC',
+              'XAUUSD': 'GOLD'
             };
 
-            const cotSymbols = [
-              { sym: 'EURUSD', quandl: '098662' }, // EUR
-              { sym: 'GBPUSD', quandl: '096742' }, // GBP
-              { sym: 'USDJPY', quandl: '097741' }, // JPY
-              { sym: 'AUDUSD', quandl: '232741' }, // AUD
-              { sym: 'USDCAD', quandl: '090741' }, // CAD
-              { sym: 'USDCHF', quandl: '092741' }, // CHF
-              { sym: 'XAUUSD', quandl: '088691' }, // Gold
-            ];
+            try {
+              // Télécharge le fichier CSV CFTC directement
+              const csvData = await new Promise((resolve, reject) => {
+                const req = require('https').get(cotUrl, { timeout: 20000 }, res => {
+                  let d = '';
+                  res.on('data', c => d += c);
+                  res.on('end', () => resolve(d));
+                });
+                req.on('error', reject);
+                req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+              });
 
-            for (const item of cotSymbols) {
-              try {
-                // API CFTC via Quandl (gratuit sans clé pour données COT)
-                const url = `https://data.nasdaq.com/api/v3/datasets/CFTC/${item.quandl}_FO_ALL.json?rows=2`;
-                const data = await get(url);
-                if (data && data.dataset && data.dataset.data && data.dataset.data.length > 0) {
-                  const latest = data.dataset.data[0];
-                  const prev   = data.dataset.data[1] || latest;
-                  // Colonnes COT: date, open_interest, noncomm_long, noncomm_short, ...
-                  const netLong  = (latest[5] || 0) - (latest[6] || 0); // NonComm Long - Short
-                  const prevNet  = (prev[5]   || 0) - (prev[6]   || 0);
-                  const change   = netLong - prevNet;
-                  cotData.pairs[item.sym] = {
-                    netPosition: Math.round(netLong),
-                    change: Math.round(change),
-                    direction: netLong > 5000 ? 'haussier' : netLong < -5000 ? 'baissier' : 'neutre',
-                    momentum: change > 2000 ? 'renforcement' : change < -2000 ? 'affaiblissement' : 'stable',
-                    date: latest[0],
-                    source: 'CFTC COT réel'
-                  };
-                  await sleep(300);
+              const lines = csvData.split('\n').filter(l => l.trim());
+              // Première ligne = headers
+              const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,''));
+
+              // Indices des colonnes importantes
+              const iName      = headers.indexOf('Market and Exchange Names');
+              const iDate      = headers.indexOf('As of Date in Form YYYY-MM-DD');
+              const iNonCommL  = headers.findIndex(h => h.includes('Noncommercial Positions-Long'));
+              const iNonCommS  = headers.findIndex(h => h.includes('Noncommercial Positions-Short'));
+              const iChange    = headers.findIndex(h => h.includes('Change in Noncommercial-Long'));
+
+              console.log(`COT CSV: ${lines.length} lines, columns: name=${iName} date=${iDate} long=${iNonCommL} short=${iNonCommS}`);
+
+              for (const [sym, codeName] of Object.entries(COT_CODES)) {
+                // Cherche la ligne correspondant à ce marché
+                const line = lines.find(l => l.toUpperCase().includes(codeName.toUpperCase()));
+                if (!line) {
+                  console.warn(`COT: "${codeName}" not found`);
+                  cotData.pairs[sym] = { netPosition:0, change:0, direction:'neutre', momentum:'stable', source:'Non trouvé' };
+                  continue;
                 }
-              } catch(e) {
-                console.warn(`COT error ${item.sym}: ${e.message}`);
-                // Fallback valeurs statiques si CFTC indisponible
-                cotData.pairs[item.sym] = {
-                  netPosition: 0, change: 0,
-                  direction: 'neutre', momentum: 'stable',
-                  source: 'CFTC indisponible'
+                const cols = line.split(',').map(c => c.trim().replace(/"/g,''));
+                const longPos  = parseInt(cols[iNonCommL] || '0', 10);
+                const shortPos = parseInt(cols[iNonCommS] || '0', 10);
+                const net      = longPos - shortPos;
+                const chg      = parseInt(cols[iChange]   || '0', 10);
+                const date     = cols[iDate] || '';
+
+                // Pour les paires où USD est la base, inverser le signe
+                const usdBase = ['USDJPY','USDCAD','USDCHF'].includes(sym);
+                const finalNet = usdBase ? -net : net;
+
+                cotData.pairs[sym] = {
+                  netPosition: finalNet,
+                  change:      usdBase ? -chg : chg,
+                  direction:   finalNet > 10000 ? 'haussier' : finalNet < -10000 ? 'baissier' : 'neutre',
+                  momentum:    Math.abs(chg) > 3000 ? (chg > 0 ? 'renforcement' : 'affaiblissement') : 'stable',
+                  date,
+                  longPos, shortPos,
+                  source: 'CFTC officiel'
                 };
+                console.log(`COT ${sym}: net=${finalNet} (${cotData.pairs[sym].direction}) date=${date}`);
+              }
+            } catch(e) {
+              console.warn('COT CFTC error:', e.message);
+              // Fallback statique
+              const fallback = {
+                'EURUSD':{net:42000,dir:'haussier'},'GBPUSD':{net:16000,dir:'haussier'},
+                'USDJPY':{net:-58000,dir:'baissier'},'AUDUSD':{net:-11000,dir:'baissier'},
+                'XAUUSD':{net:195000,dir:'haussier'},'USDCAD':{net:22000,dir:'haussier'},
+                'USDCHF':{net:15000,dir:'haussier'}
+              };
+              for (const [sym, v] of Object.entries(fallback)) {
+                cotData.pairs[sym] = { netPosition:v.net, change:0, direction:v.dir, momentum:'stable', source:'Statique' };
               }
             }
             return cotData;
@@ -303,54 +350,84 @@ jobs:
               const fetchD1 = minute === 0;     // seulement à H:00
               const fetchH4 = minute === 0 || minute === 30; // à H:00 et H:30
 
-              const pairsToFetch = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','XAU/USD','AUD/USD'];
+              // XAU/USD: TD gratuit ne supporte pas XAU — on utilise Yahoo Finance GC=F (Gold Futures)
+              // Tous les autres via Twelve Data
+              const pairsToFetch = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','AUD/USD'];
+              const yahooOnlyPairs = ['XAU/USD']; // Gold via Yahoo Finance seulement
               let reqCount = 0;
               const REQ_LIMIT = 25; // Conservative pour rester dans quota gratuit
 
+              // Fetch standard pairs via Twelve Data
               for (const pair of pairsToFetch) {
                 const sym = pair.replace('/','');
                 ohlcData[sym] = {};
-
                 for (const tf of TF) {
-                  // Skip D1 et H4 si pas le bon moment
                   if (tf === '1day' && !fetchD1) continue;
                   if (tf === '4h'   && !fetchH4)  continue;
-                  if (reqCount >= REQ_LIMIT) {
-                    console.log(`Request limit reached (${REQ_LIMIT}), skipping remaining`);
-                    break;
-                  }
-
+                  if (reqCount >= REQ_LIMIT) { console.log('Request limit reached, skipping'); break; }
                   console.log(`Fetching ${pair} ${tf}...`);
                   let candles = await fetchTD(pair, tf);
                   reqCount++;
-                  await sleep(500); // Respecter rate limit TD
-
-                  // Fallback AV si TD échoue
+                  await sleep(500);
                   if (!candles) {
                     console.log(`TD failed, trying AV for ${pair} ${tf}...`);
                     candles = await fetchAV(pair, tf);
-                    await sleep(13000); // AV: 5 req/min max
+                    await sleep(13000);
                   }
-
                   if (candles) {
-                    // Ancrer dernière bougie sur prix spot réel
-                    const spotPrice = spots[sym];
-                    if (spotPrice && !isNaN(spotPrice)) {
-                      const last = candles.closes.length - 1;
-                      candles.closes[last] = spotPrice;
-                      candles.highs[last]  = Math.max(candles.highs[last], spotPrice);
-                      candles.lows[last]   = Math.min(candles.lows[last], spotPrice);
+                    const sp = spots[sym];
+                    if (sp && !isNaN(sp)) {
+                      const last = candles.closes.length-1;
+                      candles.closes[last]=sp; candles.highs[last]=Math.max(candles.highs[last],sp); candles.lows[last]=Math.min(candles.lows[last],sp);
                     }
-                    ohlcData[sym][TF_MAP[tf]] = {
-                      ...candles,
-                      fetchedAt: new Date().toISOString()
-                    };
+                    ohlcData[sym][TF_MAP[tf]] = { ...candles, fetchedAt: new Date().toISOString() };
                     console.log(`✓ ${sym} ${tf}: ${candles.closes.length} candles (${candles.source})`);
-                  } else {
-                    console.warn(`✗ ${sym} ${tf}: no data`);
-                  }
+                  } else { console.warn(`✗ ${sym} ${tf}: no data`); }
                 }
                 if (reqCount >= REQ_LIMIT) break;
+              }
+
+              // Fetch XAU/USD via Yahoo Finance (Gold Futures GC=F)
+              for (const pair of yahooOnlyPairs) {
+                const sym = pair.replace('/','');
+                ohlcData[sym] = {};
+                const yahooMap = { '15min':'15m','1h':'1h','4h':'1h','1day':'1d' };
+                const rangeMap  = { '15min':'2d','1h':'7d','4h':'30d','1day':'90d' };
+                for (const tf of TF) {
+                  if (tf === '1day' && !fetchD1) continue;
+                  if (tf === '4h'   && !fetchH4)  continue;
+                  console.log(`Fetching ${pair} ${tf} via Yahoo...`);
+                  try {
+                    const yUrl = `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=${yahooMap[tf]}&range=${rangeMap[tf]}&includePrePost=false`;
+                    const yData = await get(yUrl);
+                    const res = yData && yData.chart && yData.chart.result && yData.chart.result[0];
+                    if (!res || !res.timestamp) { console.warn(`✗ ${sym} ${tf}: Yahoo no data`); continue; }
+                    const q = res.indicators && res.indicators.quote && res.indicators.quote[0];
+                    if (!q || !q.close) { console.warn(`✗ ${sym} ${tf}: Yahoo no quotes`); continue; }
+                    const opens=[],highs=[],lows=[],closes=[],timestamps=[];
+                    const blockSize = tf==='4h' ? 4 : 1;
+                    let block=[];
+                    for (let i=0;i<res.timestamp.length;i++) {
+                      const o=q.open[i],h=q.high[i],l=q.low[i],c=q.close[i];
+                      if (o===null||o===undefined||isNaN(o)) continue;
+                      if (blockSize===1) { opens.push(+o);highs.push(+h);lows.push(+l);closes.push(+c);timestamps.push(res.timestamp[i]); }
+                      else {
+                        block.push({o:+o,h:+h,l:+l,c:+c,t:res.timestamp[i]});
+                        if (block.length===blockSize) {
+                          opens.push(block[0].o); highs.push(Math.max(...block.map(b=>b.h)));
+                          lows.push(Math.min(...block.map(b=>b.l))); closes.push(block[blockSize-1].c);
+                          timestamps.push(block[blockSize-1].t); block=[];
+                        }
+                      }
+                    }
+                    if (closes.length < 5) { console.warn(`✗ ${sym} ${tf}: too few candles`); continue; }
+                    const sp = spots[sym];
+                    if (sp && !isNaN(sp)) { const last=closes.length-1; closes[last]=sp; highs[last]=Math.max(highs[last],sp); lows[last]=Math.min(lows[last],sp); }
+                    ohlcData[sym][TF_MAP[tf]] = { opens,highs,lows,closes,timestamps, source:'Yahoo Finance (Gold)', real:true, fetchedAt:new Date().toISOString() };
+                    console.log(`✓ ${sym} ${tf}: ${closes.length} candles (Yahoo Finance)`);
+                    await sleep(500);
+                  } catch(e) { console.warn(`✗ ${sym} ${tf} Yahoo error: ${e.message}`); }
+                }
               }
             } else {
               console.log('Weekend — skipping OHLC fetch');
