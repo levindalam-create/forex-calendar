@@ -40,6 +40,8 @@ jobs:
         run: |
           cd /tmp/repo
           node fetch_data.js
+          echo "=== Files after fetch ==="
+          ls -la *.json 2>/dev/null || echo "No JSON files"
 
       - name: Commit and push
         env:
@@ -47,8 +49,12 @@ jobs:
           REPO:     ${{ github.repository }}
         run: |
           cd /tmp/repo
-          git add -f meta.json ohlc.json news.json cot.json 2>/dev/null || true
-          if git diff --cached --quiet; then
+          echo "=== Git status before add ==="
+          git status
+          git add -f meta.json ohlc.json news.json cot.json
+          echo "=== Git status after add ==="
+          git status
+          if [ -z "$(git status --short)" ]; then
             echo "No changes to commit"
           else
             git commit -m "data: $(date -u '+%Y-%m-%d %H:%M UTC')"
