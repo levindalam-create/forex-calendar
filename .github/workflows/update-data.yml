@@ -22,6 +22,7 @@ jobs:
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
       - name: Setup Node.js 24
         run: |
@@ -526,7 +527,6 @@ jobs:
 
           main().catch(e => { console.error('Fatal:', e); process.exit(1); });
           NODEJS
-          cd $GITHUB_WORKSPACE
           node /tmp/fetch_data.js
           echo "JSON files in workdir:"
           ls -la $GITHUB_WORKSPACE/*.json 2>/dev/null || echo "No JSON files in $GITHUB_WORKSPACE" 
@@ -537,12 +537,15 @@ jobs:
 
       - name: Commit and push data files
         run: |
-          cd $GITHUB_WORKSPACE
-          ls -la *.json 2>/dev/null || true
-          git add meta.json ohlc.json news.json cot.json 2>/dev/null || true
-          if git diff --staged --quiet; then
+          # Supprimer .gitignore si il bloque les JSON
+          cat .gitignore 2>/dev/null || echo "No .gitignore"
+          sed -i '/\.json/d' .gitignore 2>/dev/null || true
+          git add -f meta.json ohlc.json news.json cot.json
+          git status
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
             git commit -m "data: update $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main
+            git push
+          fib.com/${{ github.repository }}.git main
           fi
