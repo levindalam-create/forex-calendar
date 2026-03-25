@@ -129,14 +129,15 @@ jobs:
             const since = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             // Essaie plusieurs endpoints NewsAPI
             const urls = [
-              `https://newsapi.org/v2/everything?q=forex+dollar+euro+interest+rate&language=en&sortBy=publishedAt&from=${since}&pageSize=20&apiKey=${NEWS_KEY}`,
-              `https://newsapi.org/v2/top-headlines?category=business&language=en&pageSize=20&apiKey=${NEWS_KEY}`,
-              `https://newsapi.org/v2/everything?q=fed+ECB+inflation&language=en&sortBy=relevancy&pageSize=20&apiKey=${NEWS_KEY}`
+              'https://newsapi.org/v2/top-headlines?category=business&language=en&pageSize=20&apiKey='+NEWS_KEY,
+              'https://newsapi.org/v2/everything?q=forex+dollar+fed&language=en&from='+since+'&pageSize=20&apiKey='+NEWS_KEY,
+              'https://newsapi.org/v2/top-headlines?sources=bloomberg,reuters,the-wall-street-journal&pageSize=20&apiKey='+NEWS_KEY
             ];
             let data = null;
             for (const url of urls) {
               try {
                 const d = await get(url);
+                console.log('NewsAPI:', d && d.status, 'articles:', d && d.articles && d.articles.length, d && d.code);
                 if (d && d.articles && d.articles.length > 0) { data = d; break; }
               } catch(e) { console.warn('NewsAPI attempt failed:', e.message); }
             }
@@ -239,8 +240,8 @@ jobs:
               // Trouver les colonnes par contenu partiel (insensible casse)
               const findCol = (keyword) => headers.findIndex(h => h.toLowerCase().includes(keyword.toLowerCase()));
 
-              const iName  = findCol('market_and_exchange') !== -1 ? findCol('market_and_exchange') : findCol('market and exchange');
-              const iDate  = findCol('as_of_date') !== -1 ? findCol('as_of_date') : findCol('as of date');
+              let iName  = findCol('market_and_exchange') !== -1 ? findCol('market_and_exchange') : findCol('market and exchange');
+              let iDate  = findCol('as_of_date') !== -1 ? findCol('as_of_date') : findCol('as of date');
               // Colonnes Managed Money (Asset Managers dans disaggregated = institutionnels)
               // Ou NonComm dans legacy — chercher "money_long" ou "noncomm_long"
               let iLong  = findCol('money_positions_long');
@@ -376,7 +377,7 @@ jobs:
               // Tous les autres via Twelve Data
               const pairsToFetch = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','AUD/USD','USD/CAD'];
               const yahooOnlyPairs = ['XAU/USD']; // Gold via Yahoo Finance (TD plan gratuit ne supporte pas XAU)
-              const yahooSymMap = { 'XAU/USD':'GC%3DF','AUD/USD':'AUDUSD=X','USD/CAD':'CAD=X' };
+              const yahooSymMap = { 'XAU/USD':'GC=F','AUD/USD':'AUDUSD=X','USD/CAD':'CAD=X' };
               let reqCount = 0;
               const REQ_LIMIT = 25; // Conservative pour rester dans quota gratuit
 
@@ -405,7 +406,7 @@ jobs:
                         await sleep(1500);
                         const yI = { '15min':'15m','1h':'1h','4h':'1h','1day':'1d' }[tf];
                         const yR = { '15min':'2d','1h':'7d','4h':'30d','1day':'90d' }[tf];
-                        const yUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${ySym}?interval=${yI}&range=${yR}&includePrePost=false`;
+                        const yUrl = 'https://query2.finance.yahoo.com/v8/finance/chart/'+ySym+'?interval='+yI+'&range='+yR+'&includePrePost=false';
                         const yData = await get(yUrl);
                         const res = yData && yData.chart && yData.chart.result && yData.chart.result[0];
                         if (res && res.timestamp) {
@@ -453,8 +454,8 @@ jobs:
                     await sleep(2000);
                     // Essayer query1 et query2 (Yahoo a 2 endpoints en rotation)
                     const yUrls = [
-                      `https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=${yahooMap[tf]}&range=${rangeMap[tf]}&includePrePost=false`,
-                      `https://query2.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=${yahooMap[tf]}&range=${rangeMap[tf]}&includePrePost=false`
+                      'https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval='+yahooMap[tf]+'&range='+rangeMap[tf]+'&includePrePost=false',
+                      'https://query2.finance.yahoo.com/v8/finance/chart/GC=F?interval='+yahooMap[tf]+'&range='+rangeMap[tf]+'&includePrePost=false'
                     ];
                     let yData = null;
                     for (const yUrl of yUrls) {
