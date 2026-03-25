@@ -1,0 +1,22 @@
+{
+  "updated": "2026-03-25T10:16:03.862Z",
+  "parisHour": 12,
+  "weekend": false,
+  "marketOpen": true,
+  "spots": {
+    "EURUSD": 1.15904,
+    "GBPUSD": 1.34062,
+    "USDJPY": 158.6,
+    "AUDUSD": 0.69789,
+    "USDCAD": 1.37468,
+    "USDCHF": 0.78795,
+    "EURGBP": 0.86456,
+    "GBPJPY": 212.622,
+    "XAUUSD": 4596.38
+  },
+  "fetchStats": {
+    "ohlcPairs": 7,
+    "newsCount": 0,
+    "cotUpdated": true
+  }
+}

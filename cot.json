@@ -1,0 +1,54 @@
+{
+  "updated": "2026-03-25T10:15:41.109Z",
+  "pairs": {
+    "EURUSD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "GBPUSD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "USDJPY": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "AUDUSD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "USDCAD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "USDCHF": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "XAUUSD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    }
+  }
+}
