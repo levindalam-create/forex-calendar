@@ -14,50 +14,36 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Node.js 24
         run: |
           curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash - 2>/dev/null
           sudo apt-get install -y nodejs 2>/dev/null
           node --version
 
-      - name: Clone repo
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO:     ${{ github.repository }}
-        run: |
-          git clone https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git /tmp/repo
-          cd /tmp/repo
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-
       - name: Fetch market data
         env:
           TD_KEY:   ${{ secrets.TD_KEY }}
           AV_KEY:   ${{ secrets.AV_KEY }}
           NEWS_KEY: ${{ secrets.NEWS_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO:     ${{ github.repository }}
-        run: |
-          cd /tmp/repo
-          node fetch_data.js
-          echo "=== Files after fetch ==="
-          ls -la *.json 2>/dev/null || echo "No JSON files"
+        run: node fetch_data.js
 
       - name: Commit and push
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO:     ${{ github.repository }}
         run: |
-          cd /tmp/repo
-          echo "=== Git status before add ==="
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add meta.json  || true
+          git add ohlc.json  || true
+          git add news.json  || true
+          git add cot.json   || true
           git status
-          git add -f meta.json ohlc.json news.json cot.json
-          echo "=== Git status after add ==="
-          git status
-          if [ -z "$(git status --short)" ]; then
-            echo "No changes to commit"
+          if git diff --cached --quiet && git diff --quiet; then
+            echo "Nothing to commit"
           else
             git commit -m "data: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git push https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git HEAD:main
-            echo "Pushed OK"
+            git push
           fi
