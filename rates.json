@@ -1,0 +1,151 @@
+{
+  "rates": {
+    "USD": {
+      "rate": 4.5,
+      "bank": "Fed",
+      "nextMeeting": "2026-05-07",
+      "trend": "stable",
+      "bias": "neutre"
+    },
+    "EUR": {
+      "rate": 2.65,
+      "bank": "BCE",
+      "nextMeeting": "2026-04-17",
+      "trend": "baissier",
+      "bias": "dovish"
+    },
+    "GBP": {
+      "rate": 4.5,
+      "bank": "BoE",
+      "nextMeeting": "2026-05-08",
+      "trend": "stable",
+      "bias": "neutre"
+    },
+    "JPY": {
+      "rate": 0.5,
+      "bank": "BoJ",
+      "nextMeeting": "2026-05-01",
+      "trend": "haussier",
+      "bias": "hawkish"
+    },
+    "AUD": {
+      "rate": 4.1,
+      "bank": "RBA",
+      "nextMeeting": "2026-05-20",
+      "trend": "baissier",
+      "bias": "dovish"
+    },
+    "CAD": {
+      "rate": 2.75,
+      "bank": "BoC",
+      "nextMeeting": "2026-04-16",
+      "trend": "baissier",
+      "bias": "dovish"
+    },
+    "CHF": {
+      "rate": 0.25,
+      "bank": "BNS",
+      "nextMeeting": "2026-06-19",
+      "trend": "stable",
+      "bias": "neutre"
+    },
+    "XAU": {
+      "rate": 0,
+      "bank": "N/A",
+      "nextMeeting": null,
+      "trend": "haussier",
+      "bias": "risk-off"
+    }
+  },
+  "differentials": {
+    "EURUSD": {
+      "diff": -1.85,
+      "baseRate": 2.65,
+      "quoteRate": 4.5,
+      "baseBank": "BCE",
+      "quoteBank": "Fed",
+      "baseBias": "dovish",
+      "quoteBias": "neutre",
+      "fundamentalBias": "baissier",
+      "carry": "Short EUR = carry -1.85%"
+    },
+    "GBPUSD": {
+      "diff": 0,
+      "baseRate": 4.5,
+      "quoteRate": 4.5,
+      "baseBank": "BoE",
+      "quoteBank": "Fed",
+      "baseBias": "neutre",
+      "quoteBias": "neutre",
+      "fundamentalBias": "neutre",
+      "carry": "Short GBP = carry 0.00%"
+    },
+    "USDJPY": {
+      "diff": 4,
+      "baseRate": 4.5,
+      "quoteRate": 0.5,
+      "baseBank": "Fed",
+      "quoteBank": "BoJ",
+      "baseBias": "neutre",
+      "quoteBias": "hawkish",
+      "fundamentalBias": "haussier",
+      "carry": "Long USD = carry +4.00%"
+    },
+    "GBPJPY": {
+      "diff": 4,
+      "baseRate": 4.5,
+      "quoteRate": 0.5,
+      "baseBank": "BoE",
+      "quoteBank": "BoJ",
+      "baseBias": "neutre",
+      "quoteBias": "hawkish",
+      "fundamentalBias": "haussier",
+      "carry": "Long GBP = carry +4.00%"
+    },
+    "AUDUSD": {
+      "diff": -0.4,
+      "baseRate": 4.1,
+      "quoteRate": 4.5,
+      "baseBank": "RBA",
+      "quoteBank": "Fed",
+      "baseBias": "dovish",
+      "quoteBias": "neutre",
+      "fundamentalBias": "neutre",
+      "carry": "Short AUD = carry -0.40%"
+    },
+    "USDCAD": {
+      "diff": 1.75,
+      "baseRate": 4.5,
+      "quoteRate": 2.75,
+      "baseBank": "Fed",
+      "quoteBank": "BoC",
+      "baseBias": "neutre",
+      "quoteBias": "dovish",
+      "fundamentalBias": "haussier",
+      "carry": "Long USD = carry +1.75%"
+    },
+    "USDCHF": {
+      "diff": 4.25,
+      "baseRate": 4.5,
+      "quoteRate": 0.25,
+      "baseBank": "Fed",
+      "quoteBank": "BNS",
+      "baseBias": "neutre",
+      "quoteBias": "neutre",
+      "fundamentalBias": "haussier",
+      "carry": "Long USD = carry +4.25%"
+    },
+    "XAUUSD": {
+      "diff": -4.5,
+      "baseRate": 0,
+      "quoteRate": 4.5,
+      "baseBank": "N/A",
+      "quoteBank": "Fed",
+      "baseBias": "risk-off",
+      "quoteBias": "neutre",
+      "fundamentalBias": "baissier",
+      "carry": "Short XAU = carry -4.50%"
+    }
+  },
+  "updated": "2026-04-01T08:24:42.971Z"
+}
