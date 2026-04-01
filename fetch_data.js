@@ -7,10 +7,10 @@ const NEWS_KEY = process.env.NEWS_KEY  || '388fa2f196244bd4b3e12912e1b6d350';
 
 // ── CONFIG ──
 const PAIRS = ['EUR/USD','GBP/USD','USD/JPY','GBP/JPY','XAU/USD','AUD/USD','USD/CAD','USD/CHF'];
-const TF    = ['15min','1h','4h','1day'];
+const TF    = ['15min','1h','4h','1day','1week','1month'];
 
-const TF_MAP = { '15min':'M15', '1h':'H1', '4h':'H4', '1day':'D1' };
-const OUTPUT_SIZE = { '15min':96, '1h':48, '4h':60, '1day':90 };
+const TF_MAP = { '15min':'M15', '1h':'H1', '4h':'H4', '1day':'D1', '1week':'W1', '1month':'MN' };
+const OUTPUT_SIZE = { '15min':96, '1h':48, '4h':60, '1day':90, '1week':52, '1month':24 };
 
 function get(url) {
   return new Promise((resolve, reject) => {
@@ -293,6 +293,93 @@ async function fetchSpots() {
   return spots;
 }
 
+// ── CALENDRIER ÉCONOMIQUE — ForexFactory JSON public ──
+async function fetchForexFactory() {
+  try {
+    // ForexFactory publie un JSON public du calendrier
+    const url = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+    const data = await get(url);
+    if (!data || !Array.isArray(data)) return null;
+
+    const now = new Date();
+    const events = data
+      .filter(e => e && e.title && e.date)
+      .map(e => {
+        const dt = new Date(e.date);
+        const hoursFromNow = (dt - now) / 3600000;
+        return {
+          title: e.title || '',
+          currency: e.country || '',
+          impact: e.impact || 'Low',
+          date: e.date,
+          forecast: e.forecast || null,
+          previous: e.previous || null,
+          actual: e.actual || null,
+          hoursFromNow: +hoursFromNow.toFixed(1),
+          isUpcoming: hoursFromNow > 0 && hoursFromNow < 24,
+          isPast: hoursFromNow <= 0 && hoursFromNow > -4
+        };
+      })
+      .filter(e => Math.abs(e.hoursFromNow) < 72) // 3 jours
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const highImpact = events.filter(e => e.impact === 'High' || e.impact === 'Medium');
+    console.log(`ForexFactory: ${events.length} events (${highImpact.length} High/Medium)`);
+    return { events, updated: now.toISOString() };
+  } catch(e) {
+    console.warn('ForexFactory error:', e.message);
+    return null;
+  }
+}
+
+// ── TAUX BANQUES CENTRALES ──
+async function fetchCentralBankRates() {
+  // Taux officiels — sources publiques, pas de clé requise
+  const RATES = {
+    // Taux directeurs officiels — mis à jour manuellement lors des réunions
+    USD: { rate: 4.50, bank: 'Fed',  nextMeeting: '2026-05-07', trend: 'stable', bias: 'neutre' },
+    EUR: { rate: 2.65, bank: 'BCE',  nextMeeting: '2026-04-17', trend: 'baissier', bias: 'dovish' },
+    GBP: { rate: 4.50, bank: 'BoE',  nextMeeting: '2026-05-08', trend: 'stable', bias: 'neutre' },
+    JPY: { rate: 0.50, bank: 'BoJ',  nextMeeting: '2026-05-01', trend: 'haussier', bias: 'hawkish' },
+    AUD: { rate: 4.10, bank: 'RBA',  nextMeeting: '2026-05-20', trend: 'baissier', bias: 'dovish' },
+    CAD: { rate: 2.75, bank: 'BoC',  nextMeeting: '2026-04-16', trend: 'baissier', bias: 'dovish' },
+    CHF: { rate: 0.25, bank: 'BNS',  nextMeeting: '2026-06-19', trend: 'stable', bias: 'neutre' },
+    XAU: { rate: 0,    bank: 'N/A',  nextMeeting: null, trend: 'haussier', bias: 'risk-off' }
+  };
+
+  // Calculer le différentiel de taux pour chaque paire
+  const PAIRS_RATES = {
+    'EURUSD': { base: 'EUR', quote: 'USD' },
+    'GBPUSD': { base: 'GBP', quote: 'USD' },
+    'USDJPY': { base: 'USD', quote: 'JPY' },
+    'GBPJPY': { base: 'GBP', quote: 'JPY' },
+    'AUDUSD': { base: 'AUD', quote: 'USD' },
+    'USDCAD': { base: 'USD', quote: 'CAD' },
+    'USDCHF': { base: 'USD', quote: 'CHF' },
+    'XAUUSD': { base: 'XAU', quote: 'USD' }
+  };
+
+  const differentials = {};
+  for (const [pair, {base, quote}] of Object.entries(PAIRS_RATES)) {
+    const br = RATES[base], qr = RATES[quote];
+    if (!br || !qr) continue;
+    const diff = br.rate - qr.rate;
+    // Différentiel positif = base currency plus attractive = tendance haussière fondamentale
+    differentials[pair] = {
+      diff: +diff.toFixed(2),
+      baseRate: br.rate, quoteRate: qr.rate,
+      baseBank: br.bank, quoteBank: qr.bank,
+      baseBias: br.bias, quoteBias: qr.bias,
+      // Biais fondamental basé sur le différentiel
+      fundamentalBias: diff > 0.5 ? 'haussier' : diff < -0.5 ? 'baissier' : 'neutre',
+      carry: diff > 0 ? `Long ${base} = carry +${diff.toFixed(2)}%` : `Short ${base} = carry ${diff.toFixed(2)}%`
+    };
+  }
+
+  console.log('Central bank rates: OK,', Object.keys(differentials).length, 'pairs');
+  return { rates: RATES, differentials, updated: new Date().toISOString() };
+}
+
 // ── MAIN ──
 async function main() {
   console.log('=== FX PRO Data Fetch ===', new Date().toISOString());
@@ -315,6 +402,14 @@ async function main() {
   // ── NEWS (toujours) ──
   console.log('Fetching news...');
   const newsData = await fetchNews();
+
+  // ── CALENDRIER ÉCONOMIQUE ForexFactory ──
+  console.log('Fetching ForexFactory calendar...');
+  const calendarData = await fetchForexFactory();
+
+  // ── TAUX BANQUES CENTRALES ──
+  console.log('Fetching central bank rates...');
+  const ratesData = await fetchCentralBankRates();
 
   // ── COT (une fois par jour le vendredi ou si manquant) ──
   let cotData = null;
@@ -339,6 +434,8 @@ async function main() {
     const minute = now.getUTCMinutes();
     const fetchD1 = minute === 0;     // seulement à H:00
     const fetchH4 = minute === 0 || minute === 30; // à H:00 et H:30
+    const fetchW1 = minute === 0 && hour === 8;  // une fois par jour à 8h UTC
+    const fetchMN = minute === 0 && hour === 8 && now.getUTCDate() === 1; // 1er du mois
 
     // XAU/USD: TD gratuit ne supporte pas XAU — on utilise Yahoo Finance GC=F (Gold Futures)
     // Tous les autres via Twelve Data
@@ -480,16 +577,20 @@ async function main() {
   console.log('Writing JSON to:', WORKDIR);
   fs.writeFileSync(path.join(WORKDIR, 'meta.json'),    JSON.stringify(meta,    null, 2));
   fs.writeFileSync(path.join(WORKDIR, 'ohlc.json'),    JSON.stringify(ohlcData, null, 2));
-  // Toujours écrire news.json même si fetch échoue
   const newsOut = newsData || { articles: [], sentiment: {}, updated: new Date().toISOString() };
   fs.writeFileSync(path.join(WORKDIR, 'news.json'), JSON.stringify(newsOut, null, 2));
-  if (cotData)  fs.writeFileSync(path.join(WORKDIR, 'cot.json'),  JSON.stringify(cotData,  null, 2));
+  if (cotData)      fs.writeFileSync(path.join(WORKDIR, 'cot.json'),      JSON.stringify(cotData,      null, 2));
+  if (calendarData) fs.writeFileSync(path.join(WORKDIR, 'calendar.json'), JSON.stringify(calendarData, null, 2));
+  if (ratesData)    fs.writeFileSync(path.join(WORKDIR, 'rates.json'),    JSON.stringify(ratesData,    null, 2));
+
 
   console.log('✅ Files written:');
   console.log('  meta.json —', JSON.stringify(meta.fetchStats));
   console.log('  ohlc.json —', Object.keys(ohlcData).length, 'pairs');
-  if (newsData) console.log('  news.json —', newsData.articles.length, 'articles');
-  if (cotData)  console.log('  cot.json  — COT updated');
+  console.log('  news.json —', newsOut.articles ? newsOut.articles.length : 0, 'articles');
+  if (cotData)      console.log('  cot.json  — COT updated');
+  if (calendarData) console.log('  calendar.json —', calendarData.events.length, 'events');
+  if (ratesData)    console.log('  rates.json — taux banques centrales OK');
 }
 
 main().catch(e => { console.error('Fatal:', e); process.exit(1); });
