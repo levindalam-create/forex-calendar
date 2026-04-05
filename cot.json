@@ -1,54 +1,54 @@
 {
-  "generated": "2026-04-05T12:14:54.622995Z",
-  "source": "Test",
+  "generated": "2026-04-05T12:21:28.670Z",
+  "source": "CFTC+fallback",
   "pairs": {
     "EURUSD": {
       "pos": 42000,
       "dir": "haussier",
       "change": 1200,
       "momentum": "stable",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     },
     "GBPUSD": {
       "pos": 15000,
       "dir": "haussier",
       "change": -500,
       "momentum": "stable",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     },
     "USDJPY": {
       "pos": -45000,
       "dir": "baissier",
       "change": -2100,
       "momentum": "deceleration",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     },
     "GBPJPY": {
       "pos": 12000,
       "dir": "haussier",
       "change": 800,
       "momentum": "stable",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     },
     "XAUUSD": {
       "pos": 185000,
       "dir": "haussier",
       "change": 3200,
       "momentum": "acceleration",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     },
     "NAS100": {
       "pos": 28000,
       "dir": "haussier",
       "change": 1500,
       "momentum": "stable",
-      "date": "2026-04-04",
-      "source": "Test"
+      "date": "",
+      "source": "Fallback"
     }
   }
 }
