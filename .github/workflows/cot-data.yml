@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 22 * * 5'
-    - cron: '0 8  * * 6'
 
 permissions:
   contents: write
@@ -16,61 +15,74 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Write fetch script
-        run: |
-          cat > /tmp/fetch_cot.py << 'PYEOF'
-import urllib.request, json, datetime
+      - name: Fetch and write cot.json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const https = require('https');
+            const fs = require('fs');
 
-CODES = {
-  'EURUSD': '099741', 'GBPUSD': '096742', 'USDJPY': '097741',
-  'GBPJPY': '096742', 'XAUUSD': '088691', 'NAS100': '209742',
-}
-FALLBACK = {
-  'EURUSD': {'pos': 42000,  'dir': 'haussier', 'change': 1200,  'momentum': 'stable'},
-  'GBPUSD': {'pos': 15000,  'dir': 'haussier', 'change': -500,  'momentum': 'stable'},
-  'USDJPY': {'pos': -45000, 'dir': 'baissier', 'change': -2100, 'momentum': 'deceleration'},
-  'GBPJPY': {'pos': 12000,  'dir': 'haussier', 'change': 800,   'momentum': 'stable'},
-  'XAUUSD': {'pos': 185000, 'dir': 'haussier', 'change': 3200,  'momentum': 'acceleration'},
-  'NAS100': {'pos': 28000,  'dir': 'haussier', 'change': 1500,  'momentum': 'stable'},
-}
-BASE = 'https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records'
-results = {}
-for sym, code in CODES.items():
-  url = BASE + '?limit=1&refine=cftc_contract_market_code%3A' + code + '&order_by=report_date_as_yyyy_mm_dd+desc&select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Cchange_in_noncomm_long_all%2Cchange_in_noncomm_short_all'
-  try:
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
-    resp = urllib.request.urlopen(req, timeout=20)
-    data = json.loads(resp.read().decode())
-    recs = data.get('results') or data.get('records') or []
-    if not recs:
-      raise Exception('no records')
-    r = recs[0]
-    lp = int(r.get('noncomm_positions_long_all') or 0)
-    sp = int(r.get('noncomm_positions_short_all') or 0)
-    cl = int(r.get('change_in_noncomm_long_all') or 0)
-    cs = int(r.get('change_in_noncomm_short_all') or 0)
-    net = lp - sp
-    chg = cl - cs
-    thr = max(5000, abs(net) * 0.05)
-    d = 'haussier' if net > thr else ('baissier' if net < -thr else 'neutre')
-    m = 'acceleration' if chg > 2000 else ('deceleration' if chg < -2000 else 'stable')
-    results[sym] = {'pos': net, 'longPos': lp, 'shortPos': sp, 'dir': d, 'change': chg,
-      'momentum': m, 'date': r.get('report_date_as_yyyy_mm_dd', ''), 'source': 'CFTC officiel'}
-    print('OK ' + sym + ' net=' + str(net) + ' dir=' + d)
-  except Exception as e:
-    print('FALLBACK ' + sym + ': ' + str(e))
-    fb = FALLBACK[sym]
-    results[sym] = {'pos': fb['pos'], 'dir': fb['dir'], 'change': fb['change'],
-      'momentum': fb['momentum'], 'date': '', 'source': 'Fallback'}
-output = {'generated': datetime.datetime.utcnow().isoformat() + 'Z', 'source': 'CFTC+fallback', 'pairs': results}
-open('cot.json', 'w').write(json.dumps(output, indent=2))
-print('Done: ' + str(len(results)) + ' pairs written')
-PYEOF
+            const CODES = {
+              EURUSD: '099741', GBPUSD: '096742', USDJPY: '097741',
+              GBPJPY: '096742', XAUUSD: '088691', NAS100: '209742'
+            };
 
-      - name: Run fetch script
-        run: python3 /tmp/fetch_cot.py
+            const FALLBACK = {
+              EURUSD: {pos:42000,  dir:'haussier', change:1200,  momentum:'stable'},
+              GBPUSD: {pos:15000,  dir:'haussier', change:-500,  momentum:'stable'},
+              USDJPY: {pos:-45000, dir:'baissier', change:-2100, momentum:'deceleration'},
+              GBPJPY: {pos:12000,  dir:'haussier', change:800,   momentum:'stable'},
+              XAUUSD: {pos:185000, dir:'haussier', change:3200,  momentum:'acceleration'},
+              NAS100: {pos:28000,  dir:'haussier', change:1500,  momentum:'stable'}
+            };
 
-      - name: Show cot.json
+            function fetchUrl(url) {
+              return new Promise((resolve, reject) => {
+                https.get(url, {headers: {'User-Agent':'Mozilla/5.0','Accept':'application/json'}}, res => {
+                  let data = '';
+                  res.on('data', c => data += c);
+                  res.on('end', () => resolve(JSON.parse(data)));
+                }).on('error', reject);
+              });
+            }
+
+            const results = {};
+            for (const [sym, code] of Object.entries(CODES)) {
+              const url = `https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records?limit=1&refine=cftc_contract_market_code:${code}&order_by=report_date_as_yyyy_mm_dd+desc&select=report_date_as_yyyy_mm_dd,noncomm_positions_long_all,noncomm_positions_short_all,change_in_noncomm_long_all,change_in_noncomm_short_all`;
+              try {
+                const data = await fetchUrl(url);
+                const recs = data.results || data.records || [];
+                if (!recs.length) throw new Error('no records');
+                const r = recs[0];
+                const lp = parseInt(r.noncomm_positions_long_all || 0);
+                const sp = parseInt(r.noncomm_positions_short_all || 0);
+                const cl = parseInt(r.change_in_noncomm_long_all || 0);
+                const cs = parseInt(r.change_in_noncomm_short_all || 0);
+                const net = lp - sp;
+                const chg = cl - cs;
+                const thr = Math.max(5000, Math.abs(net) * 0.05);
+                const dir = net > thr ? 'haussier' : net < -thr ? 'baissier' : 'neutre';
+                const mom = chg > 2000 ? 'acceleration' : chg < -2000 ? 'deceleration' : 'stable';
+                results[sym] = {pos:net, longPos:lp, shortPos:sp, dir, change:chg,
+                  momentum:mom, date:r.report_date_as_yyyy_mm_dd||'', source:'CFTC officiel'};
+                console.log(`OK ${sym}: net=${net} dir=${dir}`);
+              } catch(e) {
+                console.log(`FALLBACK ${sym}: ${e.message}`);
+                const fb = FALLBACK[sym];
+                results[sym] = {...fb, date:'', source:'Fallback'};
+              }
+            }
+
+            const output = {
+              generated: new Date().toISOString(),
+              source: 'CFTC+fallback',
+              pairs: results
+            };
+
+            fs.writeFileSync('cot.json', JSON.stringify(output, null, 2));
+            console.log(`Done: ${Object.keys(results).length} pairs`);
+
+      - name: Show result
         run: cat cot.json
 
       - name: Commit
