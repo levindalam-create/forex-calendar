@@ -1,9 +1,8 @@
-name: COT Data — CFTC Weekly
+name: COT Data CFTC
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 22 * * 5'
-    - cron: '0 8  * * 6'
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,98 +15,30 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch COT data from CFTC
+      - name: Generate COT data
         run: |
-          python3 - << 'PYEOF'
-import urllib.request, json, datetime, sys
+          python3 -c "
+          import json, datetime
+          data = {
+            'generated': datetime.datetime.utcnow().isoformat() + 'Z',
+            'source': 'Test',
+            'pairs': {
+              'EURUSD': {'pos': 42000, 'dir': 'haussier', 'change': 1200, 'momentum': 'stable', 'date': '2026-04-04', 'source': 'Test'},
+              'GBPUSD': {'pos': 15000, 'dir': 'haussier', 'change': -500, 'momentum': 'stable', 'date': '2026-04-04', 'source': 'Test'},
+              'USDJPY': {'pos': -45000, 'dir': 'baissier', 'change': -2100, 'momentum': 'deceleration', 'date': '2026-04-04', 'source': 'Test'},
+              'GBPJPY': {'pos': 12000, 'dir': 'haussier', 'change': 800, 'momentum': 'stable', 'date': '2026-04-04', 'source': 'Test'},
+              'XAUUSD': {'pos': 185000, 'dir': 'haussier', 'change': 3200, 'momentum': 'acceleration', 'date': '2026-04-04', 'source': 'Test'},
+              'NAS100': {'pos': 28000, 'dir': 'haussier', 'change': 1500, 'momentum': 'stable', 'date': '2026-04-04', 'source': 'Test'}
+            }
+          }
+          open('cot.json','w').write(__import__('json').dumps(data, indent=2))
+          print('OK')
+          "
 
-CFTC_CODES = {
-  'EURUSD': '099741',
-  'GBPUSD': '096742',
-  'USDJPY': '097741',
-  'GBPJPY': '096742',
-  'XAUUSD': '088691',
-  'NAS100': '209742',
-}
-
-BASE = 'https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records'
-
-results = {}
-
-for sym, code in CFTC_CODES.items():
-  url = (BASE
-    + '?limit=2'
-    + '&refine=cftc_contract_market_code%3A' + code
-    + '&order_by=report_date_as_yyyy_mm_dd+desc'
-    + '&select=report_date_as_yyyy_mm_dd'
-    + '%2Cnoncomm_positions_long_all'
-    + '%2Cnoncomm_positions_short_all'
-    + '%2Cchange_in_noncomm_long_all'
-    + '%2Cchange_in_noncomm_short_all'
-  )
-  print('Fetching ' + sym + ' ...')
-  print('URL: ' + url)
-  try:
-    req = urllib.request.Request(url, headers={
-      'User-Agent': 'Mozilla/5.0',
-      'Accept': 'application/json'
-    })
-    resp = urllib.request.urlopen(req, timeout=20)
-    raw = resp.read().decode('utf-8')
-    print('Raw response (first 500): ' + raw[:500])
-    data = json.loads(raw)
-    recs = data.get('results') or data.get('records') or []
-    print('Records found: ' + str(len(recs)))
-    if not recs:
-      print('  No records for ' + sym)
-      continue
-    r = recs[0]
-    print('First record: ' + json.dumps(r))
-    lp = int(r.get('noncomm_positions_long_all') or 0)
-    sp = int(r.get('noncomm_positions_short_all') or 0)
-    cl = int(r.get('change_in_noncomm_long_all') or 0)
-    cs = int(r.get('change_in_noncomm_short_all') or 0)
-    net = lp - sp
-    chg = cl - cs
-    thr = max(5000, abs(net) * 0.05)
-    d = 'haussier' if net > thr else ('baissier' if net < -thr else 'neutre')
-    m = 'acceleration' if chg > 2000 else ('deceleration' if chg < -2000 else 'stable')
-    results[sym] = {
-      'pos': net, 'longPos': lp, 'shortPos': sp,
-      'dir': d, 'change': chg, 'momentum': m,
-      'date': r.get('report_date_as_yyyy_mm_dd', ''),
-      'source': 'CFTC officiel'
-    }
-    print('  OK: ' + sym + ' net=' + str(net) + ' dir=' + d)
-  except Exception as e:
-    print('  ERROR ' + sym + ': ' + str(e))
-
-print('Total pairs fetched: ' + str(len(results)))
-
-if not results:
-  # Ne pas faire échouer le workflow — écrire un fichier vide valide
-  print('WARNING: no data fetched, writing empty cot.json')
-  results = {}
-
-output = {
-  'generated': datetime.datetime.utcnow().isoformat() + 'Z',
-  'source': 'CFTC publicreporting.cftc.gov',
-  'pairs': results
-}
-
-with open('cot.json', 'w') as f:
-  json.dump(output, f, indent=2)
-
-print('cot.json written with ' + str(len(results)) + ' pairs')
-PYEOF
-
-      - name: Show cot.json
-        run: cat cot.json
-
-      - name: Commit cot.json
+      - name: Commit
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add cot.json
-          git diff --staged --quiet && echo "No changes" || git commit -m "chore: COT CFTC $(date -u +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "cot: update $(date -u +'%Y-%m-%d')"
           git push
