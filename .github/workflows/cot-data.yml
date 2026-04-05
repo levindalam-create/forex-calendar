@@ -16,20 +16,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fetch CFTC + fallback
+      - name: Write fetch script
         run: |
-          python3 - << 'EOF'
-import urllib.request, json, datetime, sys
+          cat > /tmp/fetch_cot.py << 'PYEOF'
+import urllib.request, json, datetime
 
 CODES = {
-  'EURUSD': '099741',
-  'GBPUSD': '096742',
-  'USDJPY': '097741',
-  'GBPJPY': '096742',
-  'XAUUSD': '088691',
-  'NAS100': '209742',
+  'EURUSD': '099741', 'GBPUSD': '096742', 'USDJPY': '097741',
+  'GBPJPY': '096742', 'XAUUSD': '088691', 'NAS100': '209742',
 }
-
 FALLBACK = {
   'EURUSD': {'pos': 42000,  'dir': 'haussier', 'change': 1200,  'momentum': 'stable'},
   'GBPUSD': {'pos': 15000,  'dir': 'haussier', 'change': -500,  'momentum': 'stable'},
@@ -38,56 +33,44 @@ FALLBACK = {
   'XAUUSD': {'pos': 185000, 'dir': 'haussier', 'change': 3200,  'momentum': 'acceleration'},
   'NAS100': {'pos': 28000,  'dir': 'haussier', 'change': 1500,  'momentum': 'stable'},
 }
-
 BASE = 'https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records'
 results = {}
-
 for sym, code in CODES.items():
-  url = (BASE
-    + '?limit=1'
-    + '&refine=cftc_contract_market_code%3A' + code
-    + '&order_by=report_date_as_yyyy_mm_dd+desc'
-    + '&select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Cchange_in_noncomm_long_all%2Cchange_in_noncomm_short_all'
-  )
+  url = BASE + '?limit=1&refine=cftc_contract_market_code%3A' + code + '&order_by=report_date_as_yyyy_mm_dd+desc&select=report_date_as_yyyy_mm_dd%2Cnoncomm_positions_long_all%2Cnoncomm_positions_short_all%2Cchange_in_noncomm_long_all%2Cchange_in_noncomm_short_all'
   try:
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
     resp = urllib.request.urlopen(req, timeout=20)
     data = json.loads(resp.read().decode())
     recs = data.get('results') or data.get('records') or []
-    if recs:
-      r = recs[0]
-      lp = int(r.get('noncomm_positions_long_all') or 0)
-      sp = int(r.get('noncomm_positions_short_all') or 0)
-      cl = int(r.get('change_in_noncomm_long_all') or 0)
-      cs = int(r.get('change_in_noncomm_short_all') or 0)
-      net = lp - sp
-      chg = cl - cs
-      thr = max(5000, abs(net) * 0.05)
-      d = 'haussier' if net > thr else ('baissier' if net < -thr else 'neutre')
-      m = 'acceleration' if chg > 2000 else ('deceleration' if chg < -2000 else 'stable')
-      results[sym] = {'pos': net, 'longPos': lp, 'shortPos': sp,
-        'dir': d, 'change': chg, 'momentum': m,
-        'date': r.get('report_date_as_yyyy_mm_dd', ''), 'source': 'CFTC officiel'}
-      print('OK ' + sym + ': net=' + str(net) + ' dir=' + d)
-    else:
+    if not recs:
       raise Exception('no records')
+    r = recs[0]
+    lp = int(r.get('noncomm_positions_long_all') or 0)
+    sp = int(r.get('noncomm_positions_short_all') or 0)
+    cl = int(r.get('change_in_noncomm_long_all') or 0)
+    cs = int(r.get('change_in_noncomm_short_all') or 0)
+    net = lp - sp
+    chg = cl - cs
+    thr = max(5000, abs(net) * 0.05)
+    d = 'haussier' if net > thr else ('baissier' if net < -thr else 'neutre')
+    m = 'acceleration' if chg > 2000 else ('deceleration' if chg < -2000 else 'stable')
+    results[sym] = {'pos': net, 'longPos': lp, 'shortPos': sp, 'dir': d, 'change': chg,
+      'momentum': m, 'date': r.get('report_date_as_yyyy_mm_dd', ''), 'source': 'CFTC officiel'}
+    print('OK ' + sym + ' net=' + str(net) + ' dir=' + d)
   except Exception as e:
     print('FALLBACK ' + sym + ': ' + str(e))
-    fb = FALLBACK.get(sym, {'pos': 0, 'dir': 'neutre', 'change': 0, 'momentum': 'stable'})
+    fb = FALLBACK[sym]
     results[sym] = {'pos': fb['pos'], 'dir': fb['dir'], 'change': fb['change'],
       'momentum': fb['momentum'], 'date': '', 'source': 'Fallback'}
+output = {'generated': datetime.datetime.utcnow().isoformat() + 'Z', 'source': 'CFTC+fallback', 'pairs': results}
+open('cot.json', 'w').write(json.dumps(output, indent=2))
+print('Done: ' + str(len(results)) + ' pairs written')
+PYEOF
 
-output = {
-  'generated': datetime.datetime.utcnow().isoformat() + 'Z',
-  'source': 'CFTC + fallback',
-  'pairs': results
-}
-with open('cot.json', 'w') as f:
-  json.dump(output, f, indent=2)
-print('Done: ' + str(len(results)) + ' pairs')
-EOF
+      - name: Run fetch script
+        run: python3 /tmp/fetch_cot.py
 
-      - name: Show result
+      - name: Show cot.json
         run: cat cot.json
 
       - name: Commit
