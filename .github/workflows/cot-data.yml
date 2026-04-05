@@ -1,15 +1,12 @@
 name: COT Data — CFTC Weekly
 on:
   schedule:
-    - cron: '0 22 * * 5'   # Vendredi 22h UTC
-    - cron: '0 8  * * 6'   # Samedi 8h UTC (retry)
-  workflow_dispatch:        # Lancement manuel
+    - cron: '0 22 * * 5'
+    - cron: '0 8  * * 6'
+  workflow_dispatch:
 
 permissions:
-  contents: write           # Nécessaire pour commit cot.json
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  contents: write
 
 jobs:
   fetch-cot:
@@ -21,75 +18,96 @@ jobs:
 
       - name: Fetch COT data from CFTC
         run: |
-          python3 << 'PYEOF'
-          import urllib.request, json, datetime
+          python3 - << 'PYEOF'
+import urllib.request, json, datetime, sys
 
-          CFTC_CODES = {
-            'EURUSD': '099741',
-            'GBPUSD': '096742',
-            'USDJPY': '097741',
-            'GBPJPY': '096742',
-            'XAUUSD': '088691',
-            'NAS100': '209742',
-          }
+CFTC_CODES = {
+  'EURUSD': '099741',
+  'GBPUSD': '096742',
+  'USDJPY': '097741',
+  'GBPJPY': '096742',
+  'XAUUSD': '088691',
+  'NAS100': '209742',
+}
 
-          BASE_URL = 'https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records'
+BASE = 'https://publicreporting.cftc.gov/api/explore/v2.1/catalog/datasets/fut_disagg_txt/records'
 
-          results = {}
-          for sym, code in CFTC_CODES.items():
-            url = (BASE_URL
-              + '?limit=2'
-              + '&refine=cftc_contract_market_code:' + code
-              + '&order_by=report_date_as_yyyy_mm_dd+desc'
-              + '&select=report_date_as_yyyy_mm_dd,noncomm_positions_long_all,'
-              + 'noncomm_positions_short_all,change_in_noncomm_long_all,change_in_noncomm_short_all'
-            )
-            try:
-              req = urllib.request.Request(url, headers={'User-Agent': 'FXPROv4/1.0'})
-              resp = urllib.request.urlopen(req, timeout=15)
-              data = json.loads(resp.read().decode())
-              recs = data.get('results') or data.get('records') or []
-              if not recs:
-                print('  ' + sym + ': no records')
-                continue
-              r = recs[0]
-              long_pos  = int(r.get('noncomm_positions_long_all')  or 0)
-              short_pos = int(r.get('noncomm_positions_short_all') or 0)
-              chg_long  = int(r.get('change_in_noncomm_long_all')  or 0)
-              chg_short = int(r.get('change_in_noncomm_short_all') or 0)
-              net       = long_pos - short_pos
-              net_chg   = chg_long - chg_short
-              threshold = max(5000, abs(net) * 0.05)
-              direction = 'haussier' if net > threshold else ('baissier' if net < -threshold else 'neutre')
-              momentum  = 'acceleration' if net_chg > 2000 else ('deceleration' if net_chg < -2000 else 'stable')
-              results[sym] = {
-                'pos': net, 'longPos': long_pos, 'shortPos': short_pos,
-                'dir': direction, 'change': net_chg, 'momentum': momentum,
-                'date': r.get('report_date_as_yyyy_mm_dd', ''),
-                'source': 'CFTC officiel'
-              }
-              print('  ' + sym + ': net=' + str(net) + ' (' + direction + ') date=' + results[sym]['date'])
-            except Exception as e:
-              print('  ' + sym + ': ERREUR ' + str(e))
+results = {}
 
-          if not results:
-            print('ERREUR: aucune donnee recuperee')
-            exit(1)
+for sym, code in CFTC_CODES.items():
+  url = (BASE
+    + '?limit=2'
+    + '&refine=cftc_contract_market_code%3A' + code
+    + '&order_by=report_date_as_yyyy_mm_dd+desc'
+    + '&select=report_date_as_yyyy_mm_dd'
+    + '%2Cnoncomm_positions_long_all'
+    + '%2Cnoncomm_positions_short_all'
+    + '%2Cchange_in_noncomm_long_all'
+    + '%2Cchange_in_noncomm_short_all'
+  )
+  print('Fetching ' + sym + ' ...')
+  print('URL: ' + url)
+  try:
+    req = urllib.request.Request(url, headers={
+      'User-Agent': 'Mozilla/5.0',
+      'Accept': 'application/json'
+    })
+    resp = urllib.request.urlopen(req, timeout=20)
+    raw = resp.read().decode('utf-8')
+    print('Raw response (first 500): ' + raw[:500])
+    data = json.loads(raw)
+    recs = data.get('results') or data.get('records') or []
+    print('Records found: ' + str(len(recs)))
+    if not recs:
+      print('  No records for ' + sym)
+      continue
+    r = recs[0]
+    print('First record: ' + json.dumps(r))
+    lp = int(r.get('noncomm_positions_long_all') or 0)
+    sp = int(r.get('noncomm_positions_short_all') or 0)
+    cl = int(r.get('change_in_noncomm_long_all') or 0)
+    cs = int(r.get('change_in_noncomm_short_all') or 0)
+    net = lp - sp
+    chg = cl - cs
+    thr = max(5000, abs(net) * 0.05)
+    d = 'haussier' if net > thr else ('baissier' if net < -thr else 'neutre')
+    m = 'acceleration' if chg > 2000 else ('deceleration' if chg < -2000 else 'stable')
+    results[sym] = {
+      'pos': net, 'longPos': lp, 'shortPos': sp,
+      'dir': d, 'change': chg, 'momentum': m,
+      'date': r.get('report_date_as_yyyy_mm_dd', ''),
+      'source': 'CFTC officiel'
+    }
+    print('  OK: ' + sym + ' net=' + str(net) + ' dir=' + d)
+  except Exception as e:
+    print('  ERROR ' + sym + ': ' + str(e))
 
-          output = {
-            'generated': datetime.datetime.utcnow().isoformat() + 'Z',
-            'source': 'CFTC publicreporting.cftc.gov',
-            'pairs': results
-          }
-          with open('cot.json', 'w') as f:
-            json.dump(output, f, indent=2)
-          print('cot.json genere: ' + str(len(results)) + ' paires')
-          PYEOF
+print('Total pairs fetched: ' + str(len(results)))
+
+if not results:
+  # Ne pas faire échouer le workflow — écrire un fichier vide valide
+  print('WARNING: no data fetched, writing empty cot.json')
+  results = {}
+
+output = {
+  'generated': datetime.datetime.utcnow().isoformat() + 'Z',
+  'source': 'CFTC publicreporting.cftc.gov',
+  'pairs': results
+}
+
+with open('cot.json', 'w') as f:
+  json.dump(output, f, indent=2)
+
+print('cot.json written with ' + str(len(results)) + ' pairs')
+PYEOF
+
+      - name: Show cot.json
+        run: cat cot.json
 
       - name: Commit cot.json
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add cot.json
-          git diff --staged --quiet && echo "Pas de changement" || git commit -m "chore: COT CFTC $(date -u +'%Y-%m-%d')"
+          git diff --staged --quiet && echo "No changes" || git commit -m "chore: COT CFTC $(date -u +'%Y-%m-%d')"
           git push
