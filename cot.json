@@ -1,54 +1,54 @@
 {
-  "updated": "2026-04-10T21:57:00.765Z",
+  "generated": "2026-04-10T23:53:42.638Z",
+  "source": "CFTC+fallback",
   "pairs": {
     "EURUSD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
+      "pos": 42000,
+      "dir": "haussier",
+      "change": 1200,
       "momentum": "stable",
-      "source": "Non trouvé"
+      "date": "",
+      "source": "Fallback"
     },
     "GBPUSD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
+      "pos": 15000,
+      "dir": "haussier",
+      "change": -500,
       "momentum": "stable",
-      "source": "Non trouvé"
+      "date": "",
+      "source": "Fallback"
     },
     "USDJPY": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
-      "momentum": "stable",
-      "source": "Non trouvé"
+      "pos": -45000,
+      "dir": "baissier",
+      "change": -2100,
+      "momentum": "deceleration",
+      "date": "",
+      "source": "Fallback"
     },
-    "AUDUSD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
+    "GBPJPY": {
+      "pos": 12000,
+      "dir": "haussier",
+      "change": 800,
       "momentum": "stable",
-      "source": "Non trouvé"
-    },
-    "USDCAD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
-      "momentum": "stable",
-      "source": "Non trouvé"
-    },
-    "USDCHF": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
-      "momentum": "stable",
-      "source": "Non trouvé"
+      "date": "",
+      "source": "Fallback"
     },
     "XAUUSD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
+      "pos": 185000,
+      "dir": "haussier",
+      "change": 3200,
+      "momentum": "acceleration",
+      "date": "",
+      "source": "Fallback"
+    },
+    "NAS100": {
+      "pos": 28000,
+      "dir": "haussier",
+      "change": 1500,
       "momentum": "stable",
-      "source": "Non trouvé"
+      "date": "",
+      "source": "Fallback"
     }
   }
 }
