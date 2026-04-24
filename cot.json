@@ -1,54 +1,54 @@
 {
-  "updated": "2026-04-20T09:03:58.237Z",
+  "updated": "2026-04-24T08:55:30.452Z",
   "pairs": {
     "EURUSD": {
-      "netPosition": 0,
+      "netPosition": 42000,
       "change": 0,
-      "direction": "neutre",
+      "direction": "haussier",
       "momentum": "stable",
-      "source": "Non trouvé"
+      "source": "Statique (CFTC indispo)"
     },
     "GBPUSD": {
-      "netPosition": 0,
+      "netPosition": 16000,
       "change": 0,
-      "direction": "neutre",
+      "direction": "haussier",
       "momentum": "stable",
-      "source": "Non trouvé"
+      "source": "Statique (CFTC indispo)"
     },
     "USDJPY": {
-      "netPosition": 0,
+      "netPosition": -58000,
       "change": 0,
-      "direction": "neutre",
+      "direction": "baissier",
       "momentum": "stable",
-      "source": "Non trouvé"
+      "source": "Statique (CFTC indispo)"
     },
     "AUDUSD": {
-      "netPosition": 0,
+      "netPosition": -11000,
       "change": 0,
-      "direction": "neutre",
+      "direction": "baissier",
       "momentum": "stable",
-      "source": "Non trouvé"
-    },
-    "USDCAD": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
-      "momentum": "stable",
-      "source": "Non trouvé"
-    },
-    "USDCHF": {
-      "netPosition": 0,
-      "change": 0,
-      "direction": "neutre",
-      "momentum": "stable",
-      "source": "Non trouvé"
+      "source": "Statique (CFTC indispo)"
     },
     "XAUUSD": {
-      "netPosition": 0,
+      "netPosition": 195000,
       "change": 0,
-      "direction": "neutre",
+      "direction": "haussier",
       "momentum": "stable",
-      "source": "Non trouvé"
+      "source": "Statique (CFTC indispo)"
+    },
+    "USDCAD": {
+      "netPosition": 22000,
+      "change": 0,
+      "direction": "haussier",
+      "momentum": "stable",
+      "source": "Statique (CFTC indispo)"
+    },
+    "USDCHF": {
+      "netPosition": 15000,
+      "change": 0,
+      "direction": "haussier",
+      "momentum": "stable",
+      "source": "Statique (CFTC indispo)"
     }
   }
 }
