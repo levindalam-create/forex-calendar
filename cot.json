@@ -1,54 +1,54 @@
 {
-  "updated": "2026-05-08T22:11:24.118Z",
+  "generated": "2026-05-08T22:44:17.959Z",
+  "source": "CFTC+fallback",
   "pairs": {
     "EURUSD": {
-      "netPosition": 42000,
-      "change": 0,
-      "direction": "haussier",
+      "pos": 42000,
+      "dir": "haussier",
+      "change": 1200,
       "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "date": "",
+      "source": "Fallback"
     },
     "GBPUSD": {
-      "netPosition": 16000,
-      "change": 0,
-      "direction": "haussier",
+      "pos": 15000,
+      "dir": "haussier",
+      "change": -500,
       "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "date": "",
+      "source": "Fallback"
     },
     "USDJPY": {
-      "netPosition": -58000,
-      "change": 0,
-      "direction": "baissier",
-      "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "pos": -45000,
+      "dir": "baissier",
+      "change": -2100,
+      "momentum": "deceleration",
+      "date": "",
+      "source": "Fallback"
     },
-    "AUDUSD": {
-      "netPosition": -11000,
-      "change": 0,
-      "direction": "baissier",
+    "GBPJPY": {
+      "pos": 12000,
+      "dir": "haussier",
+      "change": 800,
       "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "date": "",
+      "source": "Fallback"
     },
     "XAUUSD": {
-      "netPosition": 195000,
-      "change": 0,
-      "direction": "haussier",
-      "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "pos": 185000,
+      "dir": "haussier",
+      "change": 3200,
+      "momentum": "acceleration",
+      "date": "",
+      "source": "Fallback"
     },
-    "USDCAD": {
-      "netPosition": 22000,
-      "change": 0,
-      "direction": "haussier",
+    "NAS100": {
+      "pos": 28000,
+      "dir": "haussier",
+      "change": 1500,
       "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
-    },
-    "USDCHF": {
-      "netPosition": 15000,
-      "change": 0,
-      "direction": "haussier",
-      "momentum": "stable",
-      "source": "Statique (CFTC indispo)"
+      "date": "",
+      "source": "Fallback"
     }
   }
 }
