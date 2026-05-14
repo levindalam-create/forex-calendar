@@ -1,8 +1,8 @@
 {
-  "updated": "2026-05-14T20:47:18.976Z",
-  "parisHour": 22,
+  "updated": "2026-05-14T22:01:04.007Z",
+  "parisHour": 0,
   "weekend": false,
-  "marketOpen": true,
+  "marketOpen": false,
   "spots": {
     "EURUSD": 1.17142,
     "GBPUSD": 1.35278,
@@ -15,7 +15,7 @@
     "XAUUSD": 4676.06
   },
   "fetchStats": {
-    "ohlcPairs": 7,
+    "ohlcPairs": 6,
     "newsCount": 0,
     "cotUpdated": false
   }
