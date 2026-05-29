@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T17:25:43.915Z",
+  "updated": "2026-05-29T19:44:30.092Z",
   "pairs": {
     "EURUSD": {
       "netPosition": 0,
@@ -44,13 +44,13 @@
       "source": "Non trouvé"
     },
     "XAUUSD": {
-      "netPosition": -379237,
+      "netPosition": -353401,
       "change": 0,
       "direction": "baissier",
       "momentum": "stable",
-      "date": "2026-05-19",
+      "date": "2026-05-26",
       "longPos": 88,
-      "shortPos": 379325,
+      "shortPos": 353489,
       "source": "CFTC officiel"
     }
   }
