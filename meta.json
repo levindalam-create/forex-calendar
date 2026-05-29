@@ -1,18 +1,18 @@
 {
-  "updated": "2026-05-29T13:48:20.374Z",
-  "parisHour": 15,
+  "updated": "2026-05-29T17:26:19.729Z",
+  "parisHour": 19,
   "weekend": false,
   "marketOpen": true,
   "spots": {
-    "EURUSD": 1.15893,
-    "GBPUSD": 1.33718,
-    "USDJPY": 159.58,
-    "AUDUSD": 0.71011,
-    "USDCAD": 1.38674,
-    "USDCHF": 0.78982,
-    "EURGBP": 0.8667,
-    "GBPJPY": 213.387,
-    "XAUUSD": 4380.97
+    "EURUSD": 1.1639,
+    "GBPUSD": 1.34347,
+    "USDJPY": 159.358,
+    "AUDUSD": 0.71569,
+    "USDCAD": 1.37881,
+    "USDCHF": 0.78429,
+    "EURGBP": 0.86634,
+    "GBPJPY": 214.093,
+    "XAUUSD": 4503.44
   },
   "fetchStats": {
     "ohlcPairs": 7,
