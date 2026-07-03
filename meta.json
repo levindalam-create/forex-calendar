@@ -1,8 +1,8 @@
 {
-  "updated": "2026-07-03T21:22:19.252Z",
-  "parisHour": 23,
+  "updated": "2026-07-03T22:31:49.563Z",
+  "parisHour": 0,
   "weekend": false,
-  "marketOpen": true,
+  "marketOpen": false,
   "spots": {
     "EURUSD": 1.144,
     "GBPUSD": 1.33597,
