@@ -1,54 +1,57 @@
 {
-  "generated": "2026-07-03T22:54:00.098Z",
-  "source": "CFTC+fallback",
+  "updated": "2026-07-06T11:21:27.718Z",
   "pairs": {
     "EURUSD": {
-      "pos": 42000,
-      "dir": "haussier",
-      "change": 1200,
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
       "momentum": "stable",
-      "date": "",
-      "source": "Fallback"
+      "source": "Non trouvé"
     },
     "GBPUSD": {
-      "pos": 15000,
-      "dir": "haussier",
-      "change": -500,
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
       "momentum": "stable",
-      "date": "",
-      "source": "Fallback"
+      "source": "Non trouvé"
     },
     "USDJPY": {
-      "pos": -45000,
-      "dir": "baissier",
-      "change": -2100,
-      "momentum": "deceleration",
-      "date": "",
-      "source": "Fallback"
-    },
-    "GBPJPY": {
-      "pos": 12000,
-      "dir": "haussier",
-      "change": 800,
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
       "momentum": "stable",
-      "date": "",
-      "source": "Fallback"
+      "source": "Non trouvé"
+    },
+    "AUDUSD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "USDCAD": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
+    },
+    "USDCHF": {
+      "netPosition": 0,
+      "change": 0,
+      "direction": "neutre",
+      "momentum": "stable",
+      "source": "Non trouvé"
     },
     "XAUUSD": {
-      "pos": 185000,
-      "dir": "haussier",
-      "change": 3200,
-      "momentum": "acceleration",
-      "date": "",
-      "source": "Fallback"
-    },
-    "NAS100": {
-      "pos": 28000,
-      "dir": "haussier",
-      "change": 1500,
+      "netPosition": -352079,
+      "change": 0,
+      "direction": "baissier",
       "momentum": "stable",
-      "date": "",
-      "source": "Fallback"
+      "date": "2026-06-23",
+      "longPos": 88,
+      "shortPos": 352167,
+      "source": "CFTC officiel"
     }
   }
 }
