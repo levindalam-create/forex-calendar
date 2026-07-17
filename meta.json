@@ -1,6 +1,6 @@
 {
-  "updated": "2026-07-16T21:46:22.543Z",
-  "parisHour": 23,
+  "updated": "2026-07-17T09:03:11.098Z",
+  "parisHour": 11,
   "weekend": false,
   "marketOpen": true,
   "spots": {
@@ -17,6 +17,6 @@
   "fetchStats": {
     "ohlcPairs": 7,
     "newsCount": 0,
-    "cotUpdated": false
+    "cotUpdated": true
   }
 }
