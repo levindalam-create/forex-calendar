@@ -1,6 +1,6 @@
 {
-  "updated": "2026-07-21T11:21:50.826Z",
-  "parisHour": 13,
+  "updated": "2026-07-21T12:50:54.835Z",
+  "parisHour": 14,
   "weekend": false,
   "marketOpen": true,
   "spots": {
@@ -12,7 +12,7 @@
     "USDCHF": 0.80745,
     "EURGBP": 0.85002,
     "GBPJPY": 218.548,
-    "XAUUSD": 4037.69
+    "XAUUSD": 4024.32
   },
   "fetchStats": {
     "ohlcPairs": 7,
