@@ -1,90 +1,6 @@
 {
   "events": [
     {
-      "title": "CPI q/q",
-      "currency": "NZD",
-      "impact": "High",
-      "date": "2026-07-20T18:45:00-04:00",
-      "forecast": "1.4%",
-      "previous": "0.9%",
-      "actual": null,
-      "hoursFromNow": -71.9,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "Claimant Count Change",
-      "currency": "GBP",
-      "impact": "High",
-      "date": "2026-07-21T02:00:00-04:00",
-      "forecast": "29.4K",
-      "previous": "31.2K",
-      "actual": null,
-      "hoursFromNow": -64.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "Average Earnings Index 3m/y",
-      "currency": "GBP",
-      "impact": "Medium",
-      "date": "2026-07-21T02:00:00-04:00",
-      "forecast": "4.5%",
-      "previous": "4.4%",
-      "actual": null,
-      "hoursFromNow": -64.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "Public Sector Net Borrowing",
-      "currency": "GBP",
-      "impact": "Low",
-      "date": "2026-07-21T02:00:00-04:00",
-      "forecast": "17.8B",
-      "previous": "23.3B",
-      "actual": null,
-      "hoursFromNow": -64.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "Unemployment Rate",
-      "currency": "GBP",
-      "impact": "Low",
-      "date": "2026-07-21T02:00:00-04:00",
-      "forecast": "4.9%",
-      "previous": "4.9%",
-      "actual": null,
-      "hoursFromNow": -64.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "ZEW Economic Sentiment",
-      "currency": "EUR",
-      "impact": "Low",
-      "date": "2026-07-21T05:00:00-04:00",
-      "forecast": "11.2",
-      "previous": "9.5",
-      "actual": null,
-      "hoursFromNow": -61.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
-      "title": "German ZEW Economic Sentiment",
-      "currency": "EUR",
-      "impact": "Low",
-      "date": "2026-07-21T05:00:00-04:00",
-      "forecast": "15.1",
-      "previous": "10.5",
-      "actual": null,
-      "hoursFromNow": -61.6,
-      "isUpcoming": false,
-      "isPast": false
-    },
-    {
       "title": "German Buba President Nagel Speaks",
       "currency": "EUR",
       "impact": "Low",
@@ -92,7 +8,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -59.1,
+      "hoursFromNow": -69.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -104,7 +20,7 @@
       "forecast": null,
       "previous": "19.8K",
       "actual": null,
-      "hoursFromNow": -58.4,
+      "hoursFromNow": -69,
       "isUpcoming": false,
       "isPast": false
     },
@@ -116,7 +32,7 @@
       "forecast": null,
       "previous": "-4.9%",
       "actual": null,
-      "hoursFromNow": -55.3,
+      "hoursFromNow": -66,
       "isUpcoming": false,
       "isPast": false
     },
@@ -128,7 +44,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -50.1,
+      "hoursFromNow": -60.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -140,7 +56,7 @@
       "forecast": "-0.56T",
       "previous": "-0.09T",
       "actual": null,
-      "hoursFromNow": -46.8,
+      "hoursFromNow": -57.4,
       "isUpcoming": false,
       "isPast": false
     },
@@ -152,7 +68,7 @@
       "forecast": null,
       "previous": "0.0%",
       "actual": null,
-      "hoursFromNow": -46.1,
+      "hoursFromNow": -56.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -164,7 +80,7 @@
       "forecast": null,
       "previous": "5.1%",
       "actual": null,
-      "hoursFromNow": -43.6,
+      "hoursFromNow": -54.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -176,7 +92,7 @@
       "forecast": "2.7%",
       "previous": "2.8%",
       "actual": null,
-      "hoursFromNow": -40.6,
+      "hoursFromNow": -51.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -188,7 +104,7 @@
       "forecast": "2.5%",
       "previous": "2.6%",
       "actual": null,
-      "hoursFromNow": -40.6,
+      "hoursFromNow": -51.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -200,7 +116,7 @@
       "forecast": "-0.7%",
       "previous": "0.2%",
       "actual": null,
-      "hoursFromNow": -40.6,
+      "hoursFromNow": -51.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -212,7 +128,7 @@
       "forecast": "-0.1%",
       "previous": "0.5%",
       "actual": null,
-      "hoursFromNow": -40.6,
+      "hoursFromNow": -51.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -224,7 +140,7 @@
       "forecast": "3.0%",
       "previous": "3.1%",
       "actual": null,
-      "hoursFromNow": -40.6,
+      "hoursFromNow": -51.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -236,7 +152,7 @@
       "forecast": "3.2%",
       "previous": "3.8%",
       "actual": null,
-      "hoursFromNow": -38.1,
+      "hoursFromNow": -48.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -248,7 +164,7 @@
       "forecast": "-2.0M",
       "previous": "-1.7M",
       "actual": null,
-      "hoursFromNow": -32.1,
+      "hoursFromNow": -42.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -260,7 +176,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -27.6,
+      "hoursFromNow": -38.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -272,7 +188,7 @@
       "forecast": "16.4K",
       "previous": "40.3K",
       "actual": null,
-      "hoursFromNow": -21.1,
+      "hoursFromNow": -31.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -284,7 +200,7 @@
       "forecast": "4.4%",
       "previous": "4.4%",
       "actual": null,
-      "hoursFromNow": -21.1,
+      "hoursFromNow": -31.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -296,7 +212,7 @@
       "forecast": null,
       "previous": "-8.6%",
       "actual": null,
-      "hoursFromNow": -13.7,
+      "hoursFromNow": -24.3,
       "isUpcoming": false,
       "isPast": false
     },
@@ -308,7 +224,7 @@
       "forecast": "-40",
       "previous": "-45",
       "actual": null,
-      "hoursFromNow": -12.6,
+      "hoursFromNow": -23.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -320,7 +236,7 @@
       "forecast": "2.40%",
       "previous": "2.40%",
       "actual": null,
-      "hoursFromNow": -10.4,
+      "hoursFromNow": -21,
       "isUpcoming": false,
       "isPast": false
     },
@@ -332,7 +248,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -10.4,
+      "hoursFromNow": -21,
       "isUpcoming": false,
       "isPast": false
     },
@@ -344,7 +260,7 @@
       "forecast": "1.3%",
       "previous": "0.1%",
       "actual": null,
-      "hoursFromNow": -10.1,
+      "hoursFromNow": -20.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -356,7 +272,7 @@
       "forecast": "1.0%",
       "previous": "0.5%",
       "actual": null,
-      "hoursFromNow": -10.1,
+      "hoursFromNow": -20.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -368,7 +284,7 @@
       "forecast": "211K",
       "previous": "208K",
       "actual": null,
-      "hoursFromNow": -10.1,
+      "hoursFromNow": -20.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -380,7 +296,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -9.9,
+      "hoursFromNow": -20.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -392,7 +308,7 @@
       "forecast": null,
       "previous": "-0.1%",
       "actual": null,
-      "hoursFromNow": -9.6,
+      "hoursFromNow": -20.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -404,7 +320,7 @@
       "forecast": "-17",
       "previous": "-18",
       "actual": null,
-      "hoursFromNow": -8.6,
+      "hoursFromNow": -19.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -416,7 +332,7 @@
       "forecast": "29B",
       "previous": "41B",
       "actual": null,
-      "hoursFromNow": -8.1,
+      "hoursFromNow": -18.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -428,9 +344,9 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -2.6,
+      "hoursFromNow": -13.2,
       "isUpcoming": false,
-      "isPast": true
+      "isPast": false
     },
     {
       "title": "Flash Manufacturing PMI",
@@ -440,8 +356,8 @@
       "forecast": null,
       "previous": "51.2",
       "actual": null,
-      "hoursFromNow": 0.4,
-      "isUpcoming": true,
+      "hoursFromNow": -10.2,
+      "isUpcoming": false,
       "isPast": false
     },
     {
@@ -452,8 +368,8 @@
       "forecast": null,
       "previous": "49.9",
       "actual": null,
-      "hoursFromNow": 0.4,
-      "isUpcoming": true,
+      "hoursFromNow": -10.2,
+      "isUpcoming": false,
       "isPast": false
     },
     {
@@ -464,8 +380,8 @@
       "forecast": "-22",
       "previous": "-23",
       "actual": null,
-      "hoursFromNow": 0.4,
-      "isUpcoming": true,
+      "hoursFromNow": -10.2,
+      "isUpcoming": false,
       "isPast": false
     },
     {
@@ -476,8 +392,8 @@
       "forecast": "1.6%",
       "previous": "1.4%",
       "actual": null,
-      "hoursFromNow": 0.9,
-      "isUpcoming": true,
+      "hoursFromNow": -9.7,
+      "isUpcoming": false,
       "isPast": false
     },
     {
@@ -488,8 +404,8 @@
       "forecast": "55.0",
       "previous": "54.9",
       "actual": null,
-      "hoursFromNow": 1.9,
-      "isUpcoming": true,
+      "hoursFromNow": -8.7,
+      "isUpcoming": false,
       "isPast": false
     },
     {
@@ -500,9 +416,9 @@
       "forecast": "-28.7",
       "previous": "-29.2",
       "actual": null,
-      "hoursFromNow": 7.4,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -3.2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Retail Sales m/m",
@@ -512,9 +428,9 @@
       "forecast": "-0.3%",
       "previous": "1.2%",
       "actual": null,
-      "hoursFromNow": 7.4,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -3.2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "French Flash Manufacturing PMI",
@@ -524,9 +440,9 @@
       "forecast": "51.0",
       "previous": "50.7",
       "actual": null,
-      "hoursFromNow": 8.6,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "French Flash Services PMI",
@@ -536,9 +452,9 @@
       "forecast": "47.5",
       "previous": "47.4",
       "actual": null,
-      "hoursFromNow": 8.6,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "German Flash Manufacturing PMI",
@@ -548,9 +464,9 @@
       "forecast": "50.4",
       "previous": "50.0",
       "actual": null,
-      "hoursFromNow": 8.9,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -1.7,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "German Flash Services PMI",
@@ -560,9 +476,9 @@
       "forecast": "49.0",
       "previous": "46.8",
       "actual": null,
-      "hoursFromNow": 8.9,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -1.7,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Flash Manufacturing PMI",
@@ -572,9 +488,9 @@
       "forecast": "51.5",
       "previous": "51.3",
       "actual": null,
-      "hoursFromNow": 9.4,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -1.2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Flash Services PMI",
@@ -584,9 +500,9 @@
       "forecast": "49.8",
       "previous": "48.9",
       "actual": null,
-      "hoursFromNow": 9.4,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -1.2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Flash Manufacturing PMI",
@@ -596,9 +512,9 @@
       "forecast": "52.0",
       "previous": "53.1",
       "actual": null,
-      "hoursFromNow": 9.9,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -0.7,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Flash Services PMI",
@@ -608,9 +524,9 @@
       "forecast": "49.4",
       "previous": "48.7",
       "actual": null,
-      "hoursFromNow": 9.9,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -0.7,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "IPPI m/m",
@@ -620,7 +536,7 @@
       "forecast": "-0.4%",
       "previous": "1.2%",
       "actual": null,
-      "hoursFromNow": 13.9,
+      "hoursFromNow": 3.3,
       "isUpcoming": true,
       "isPast": false
     },
@@ -632,7 +548,7 @@
       "forecast": "-0.2%",
       "previous": "-0.3%",
       "actual": null,
-      "hoursFromNow": 13.9,
+      "hoursFromNow": 3.3,
       "isUpcoming": true,
       "isPast": false
     },
@@ -644,7 +560,7 @@
       "forecast": "-1.5%",
       "previous": "0.7%",
       "actual": null,
-      "hoursFromNow": 13.9,
+      "hoursFromNow": 3.3,
       "isUpcoming": true,
       "isPast": false
     },
@@ -656,7 +572,7 @@
       "forecast": "-10.2",
       "previous": "-12.4",
       "actual": null,
-      "hoursFromNow": 14.4,
+      "hoursFromNow": 3.8,
       "isUpcoming": true,
       "isPast": false
     },
@@ -668,7 +584,7 @@
       "forecast": "54.4",
       "previous": "55.7",
       "actual": null,
-      "hoursFromNow": 15.1,
+      "hoursFromNow": 4.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -680,7 +596,7 @@
       "forecast": "51.3",
       "previous": "51.3",
       "actual": null,
-      "hoursFromNow": 15.1,
+      "hoursFromNow": 4.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -692,10 +608,10 @@
       "forecast": "609K",
       "previous": "580K",
       "actual": null,
-      "hoursFromNow": 15.4,
+      "hoursFromNow": 4.8,
       "isUpcoming": true,
       "isPast": false
     }
   ],
-  "updated": "2026-07-23T22:36:05.656Z"
+  "updated": "2026-07-24T09:14:21.563Z"
 }
