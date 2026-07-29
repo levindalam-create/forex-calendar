@@ -1,6 +1,6 @@
 {
-  "updated": "2026-07-29T16:56:17.844Z",
-  "parisHour": 18,
+  "updated": "2026-07-29T18:02:08.112Z",
+  "parisHour": 20,
   "weekend": false,
   "marketOpen": true,
   "spots": {
@@ -15,7 +15,7 @@
     "XAUUSD": 4028.4
   },
   "fetchStats": {
-    "ohlcPairs": 7,
+    "ohlcPairs": 6,
     "newsCount": 0,
     "cotUpdated": false
   }
