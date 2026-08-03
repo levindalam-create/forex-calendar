@@ -8,7 +8,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -28.2,
+      "hoursFromNow": -30.8,
       "isUpcoming": false,
       "isPast": false
     },
@@ -20,7 +20,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -16.5,
+      "hoursFromNow": -19,
       "isUpcoming": false,
       "isPast": false
     },
@@ -32,7 +32,7 @@
       "forecast": null,
       "previous": "-4.0%",
       "actual": null,
-      "hoursFromNow": -14.7,
+      "hoursFromNow": -17.3,
       "isUpcoming": false,
       "isPast": false
     },
@@ -44,7 +44,7 @@
       "forecast": "54.7",
       "previous": "54.7",
       "actual": null,
-      "hoursFromNow": -13,
+      "hoursFromNow": -15.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -56,7 +56,7 @@
       "forecast": null,
       "previous": "-0.4%",
       "actual": null,
-      "hoursFromNow": -12.5,
+      "hoursFromNow": -15,
       "isUpcoming": false,
       "isPast": false
     },
@@ -68,7 +68,7 @@
       "forecast": "51.9",
       "previous": "51.7",
       "actual": null,
-      "hoursFromNow": -11.7,
+      "hoursFromNow": -14.3,
       "isUpcoming": false,
       "isPast": false
     },
@@ -80,7 +80,7 @@
       "forecast": "-0.4%",
       "previous": "1.1%",
       "actual": null,
-      "hoursFromNow": -7.5,
+      "hoursFromNow": -10,
       "isUpcoming": false,
       "isPast": false
     },
@@ -92,7 +92,7 @@
       "forecast": "-0.1%",
       "previous": "0.0%",
       "actual": null,
-      "hoursFromNow": -7,
+      "hoursFromNow": -9.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -104,7 +104,7 @@
       "forecast": "50.5",
       "previous": "49.7",
       "actual": null,
-      "hoursFromNow": -6.2,
+      "hoursFromNow": -8.8,
       "isUpcoming": false,
       "isPast": false
     },
@@ -116,7 +116,7 @@
       "forecast": "54.5",
       "previous": "54.3",
       "actual": null,
-      "hoursFromNow": -6,
+      "hoursFromNow": -8.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -128,7 +128,7 @@
       "forecast": "52.5",
       "previous": "52.2",
       "actual": null,
-      "hoursFromNow": -5.7,
+      "hoursFromNow": -8.3,
       "isUpcoming": false,
       "isPast": false
     },
@@ -140,7 +140,7 @@
       "forecast": "50.0",
       "previous": "50.0",
       "actual": null,
-      "hoursFromNow": -5.6,
+      "hoursFromNow": -8.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -152,7 +152,7 @@
       "forecast": "52.2",
       "previous": "52.2",
       "actual": null,
-      "hoursFromNow": -5.6,
+      "hoursFromNow": -8.1,
       "isUpcoming": false,
       "isPast": false
     },
@@ -164,7 +164,7 @@
       "forecast": "52.0",
       "previous": "52.0",
       "actual": null,
-      "hoursFromNow": -5.5,
+      "hoursFromNow": -8,
       "isUpcoming": false,
       "isPast": false
     },
@@ -176,7 +176,7 @@
       "forecast": "52.8",
       "previous": "52.8",
       "actual": null,
-      "hoursFromNow": -5,
+      "hoursFromNow": -7.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -188,9 +188,9 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": -1.5,
+      "hoursFromNow": -4,
       "isUpcoming": false,
-      "isPast": true
+      "isPast": false
     },
     {
       "title": "Final Manufacturing PMI",
@@ -200,9 +200,9 @@
       "forecast": "53.8",
       "previous": "53.8",
       "actual": null,
-      "hoursFromNow": 0.3,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2.3,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "ISM Manufacturing PMI",
@@ -212,9 +212,9 @@
       "forecast": "54.0",
       "previous": "53.3",
       "actual": null,
-      "hoursFromNow": 0.5,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "ISM Manufacturing Prices",
@@ -224,9 +224,9 @@
       "forecast": "70.0",
       "previous": "73.0",
       "actual": null,
-      "hoursFromNow": 0.5,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Construction Spending m/m",
@@ -236,9 +236,9 @@
       "forecast": "0.2%",
       "previous": "0.1%",
       "actual": null,
-      "hoursFromNow": 0.5,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -2,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Omdia Total Vehicle Sales",
@@ -248,9 +248,9 @@
       "forecast": "16.3M",
       "previous": "16.5M",
       "actual": null,
-      "hoursFromNow": 0.8,
-      "isUpcoming": true,
-      "isPast": false
+      "hoursFromNow": -1.8,
+      "isUpcoming": false,
+      "isPast": true
     },
     {
       "title": "Loan Officer Survey",
@@ -260,7 +260,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 4.6,
+      "hoursFromNow": 2,
       "isUpcoming": true,
       "isPast": false
     },
@@ -272,7 +272,7 @@
       "forecast": "-13.0%",
       "previous": "-13.7%",
       "actual": null,
-      "hoursFromNow": 10.4,
+      "hoursFromNow": 7.8,
       "isUpcoming": true,
       "isPast": false
     },
@@ -284,7 +284,7 @@
       "forecast": null,
       "previous": "-0.2%",
       "actual": null,
-      "hoursFromNow": 12,
+      "hoursFromNow": 9.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -296,7 +296,7 @@
       "forecast": "0.2%",
       "previous": "1.3%",
       "actual": null,
-      "hoursFromNow": 12,
+      "hoursFromNow": 9.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -308,7 +308,7 @@
       "forecast": null,
       "previous": "2.73|3.1",
       "actual": null,
-      "hoursFromNow": 14.1,
+      "hoursFromNow": 11.6,
       "isUpcoming": true,
       "isPast": false
     },
@@ -320,7 +320,7 @@
       "forecast": null,
       "previous": "16.9%",
       "actual": null,
-      "hoursFromNow": 17,
+      "hoursFromNow": 14.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -332,7 +332,7 @@
       "forecast": null,
       "previous": "-93.3B",
       "actual": null,
-      "hoursFromNow": 17.3,
+      "hoursFromNow": 14.7,
       "isUpcoming": true,
       "isPast": false
     },
@@ -344,7 +344,7 @@
       "forecast": "-20.3K",
       "previous": "-28.7K",
       "actual": null,
-      "hoursFromNow": 17.5,
+      "hoursFromNow": 15,
       "isUpcoming": true,
       "isPast": false
     },
@@ -356,7 +356,7 @@
       "forecast": "0.1%",
       "previous": "0.2%",
       "actual": null,
-      "hoursFromNow": 18.5,
+      "hoursFromNow": 16,
       "isUpcoming": true,
       "isPast": false
     },
@@ -368,7 +368,7 @@
       "forecast": "3.0B",
       "previous": "4.2B",
       "actual": null,
-      "hoursFromNow": 23,
+      "hoursFromNow": 20.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -380,7 +380,7 @@
       "forecast": "-73.0B",
       "previous": "-77.6B",
       "actual": null,
-      "hoursFromNow": 23,
+      "hoursFromNow": 20.5,
       "isUpcoming": true,
       "isPast": false
     },
@@ -392,8 +392,8 @@
       "forecast": "50.2",
       "previous": "53.0",
       "actual": null,
-      "hoursFromNow": 24,
-      "isUpcoming": false,
+      "hoursFromNow": 21.5,
+      "isUpcoming": true,
       "isPast": false
     },
     {
@@ -404,8 +404,8 @@
       "forecast": "7.42M",
       "previous": "7.59M",
       "actual": null,
-      "hoursFromNow": 24.5,
-      "isUpcoming": false,
+      "hoursFromNow": 22,
+      "isUpcoming": true,
       "isPast": false
     },
     {
@@ -416,8 +416,8 @@
       "forecast": "0.0%",
       "previous": "-1.3%",
       "actual": null,
-      "hoursFromNow": 24.5,
-      "isUpcoming": false,
+      "hoursFromNow": 22,
+      "isUpcoming": true,
       "isPast": false
     },
     {
@@ -428,8 +428,8 @@
       "forecast": "47.5",
       "previous": "45.5",
       "actual": null,
-      "hoursFromNow": 24.7,
-      "isUpcoming": false,
+      "hoursFromNow": 22.1,
+      "isUpcoming": true,
       "isPast": false
     },
     {
@@ -440,8 +440,8 @@
       "forecast": null,
       "previous": "1.5%",
       "actual": null,
-      "hoursFromNow": 25.4,
-      "isUpcoming": false,
+      "hoursFromNow": 22.8,
+      "isUpcoming": true,
       "isPast": false
     },
     {
@@ -452,7 +452,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 31,
+      "hoursFromNow": 28.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -464,7 +464,7 @@
       "forecast": "0.1%",
       "previous": "0.2%",
       "actual": null,
-      "hoursFromNow": 33.3,
+      "hoursFromNow": 30.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -476,7 +476,7 @@
       "forecast": "5.4%",
       "previous": "5.3%",
       "actual": null,
-      "hoursFromNow": 33.3,
+      "hoursFromNow": 30.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -488,7 +488,7 @@
       "forecast": "0.6%",
       "previous": "0.5%",
       "actual": null,
-      "hoursFromNow": 33.3,
+      "hoursFromNow": 30.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -500,7 +500,7 @@
       "forecast": "3.4%",
       "previous": "3.2%",
       "actual": null,
-      "hoursFromNow": 34,
+      "hoursFromNow": 31.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -512,7 +512,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 34.4,
+      "hoursFromNow": 31.8,
       "isUpcoming": false,
       "isPast": false
     },
@@ -524,7 +524,7 @@
       "forecast": null,
       "previous": "-1.0%",
       "actual": null,
-      "hoursFromNow": 35.5,
+      "hoursFromNow": 33,
       "isUpcoming": false,
       "isPast": false
     },
@@ -536,7 +536,7 @@
       "forecast": "53.7",
       "previous": "54.1",
       "actual": null,
-      "hoursFromNow": 36.3,
+      "hoursFromNow": 33.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -548,7 +548,7 @@
       "forecast": "0.3%",
       "previous": "-0.1%",
       "actual": null,
-      "hoursFromNow": 41.3,
+      "hoursFromNow": 38.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -560,7 +560,7 @@
       "forecast": "54.8",
       "previous": "54.2",
       "actual": null,
-      "hoursFromNow": 41.8,
+      "hoursFromNow": 39.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -572,7 +572,7 @@
       "forecast": "51.2",
       "previous": "50.2",
       "actual": null,
-      "hoursFromNow": 42.3,
+      "hoursFromNow": 39.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -584,7 +584,7 @@
       "forecast": "49.8",
       "previous": "49.8",
       "actual": null,
-      "hoursFromNow": 42.4,
+      "hoursFromNow": 39.8,
       "isUpcoming": false,
       "isPast": false
     },
@@ -596,7 +596,7 @@
       "forecast": "49.6",
       "previous": "49.6",
       "actual": null,
-      "hoursFromNow": 42.4,
+      "hoursFromNow": 39.9,
       "isUpcoming": false,
       "isPast": false
     },
@@ -608,7 +608,7 @@
       "forecast": "51.6",
       "previous": "51.6",
       "actual": null,
-      "hoursFromNow": 42.5,
+      "hoursFromNow": 40,
       "isUpcoming": false,
       "isPast": false
     },
@@ -620,7 +620,7 @@
       "forecast": "51.8",
       "previous": "51.8",
       "actual": null,
-      "hoursFromNow": 43,
+      "hoursFromNow": 40.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -632,7 +632,7 @@
       "forecast": "-0.3%",
       "previous": "0.2%",
       "actual": null,
-      "hoursFromNow": 43.5,
+      "hoursFromNow": 41,
       "isUpcoming": false,
       "isPast": false
     },
@@ -644,7 +644,7 @@
       "forecast": "71K",
       "previous": "98K",
       "actual": null,
-      "hoursFromNow": 46.8,
+      "hoursFromNow": 44.2,
       "isUpcoming": false,
       "isPast": false
     },
@@ -656,7 +656,7 @@
       "forecast": "53.6",
       "previous": "53.6",
       "actual": null,
-      "hoursFromNow": 48.3,
+      "hoursFromNow": 45.7,
       "isUpcoming": false,
       "isPast": false
     },
@@ -668,7 +668,7 @@
       "forecast": "54.5",
       "previous": "54.0",
       "actual": null,
-      "hoursFromNow": 48.5,
+      "hoursFromNow": 46,
       "isUpcoming": false,
       "isPast": false
     },
@@ -680,7 +680,7 @@
       "forecast": null,
       "previous": "-7.2M",
       "actual": null,
-      "hoursFromNow": 49,
+      "hoursFromNow": 46.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -692,7 +692,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 54.6,
+      "hoursFromNow": 52.1,
       "isUpcoming": false,
       "isPast": false
     },
@@ -704,7 +704,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 59.1,
+      "hoursFromNow": 56.6,
       "isUpcoming": false,
       "isPast": false
     },
@@ -716,7 +716,7 @@
       "forecast": "-1.08B",
       "previous": "-3.02B",
       "actual": null,
-      "hoursFromNow": 60,
+      "hoursFromNow": 57.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -728,7 +728,7 @@
       "forecast": null,
       "previous": "3.99|4.6",
       "actual": null,
-      "hoursFromNow": 62.1,
+      "hoursFromNow": 59.6,
       "isUpcoming": false,
       "isPast": false
     },
@@ -740,7 +740,7 @@
       "forecast": "0.5%",
       "previous": "1.9%",
       "actual": null,
-      "hoursFromNow": 64.5,
+      "hoursFromNow": 62,
       "isUpcoming": false,
       "isPast": false
     },
@@ -752,7 +752,7 @@
       "forecast": "3.1%",
       "previous": "3.1%",
       "actual": null,
-      "hoursFromNow": 65.5,
+      "hoursFromNow": 63,
       "isUpcoming": false,
       "isPast": false
     },
@@ -764,7 +764,7 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "hoursFromNow": 66.5,
+      "hoursFromNow": 64,
       "isUpcoming": false,
       "isPast": false
     },
@@ -776,7 +776,7 @@
       "forecast": "0.3%",
       "previous": "-0.3%",
       "actual": null,
-      "hoursFromNow": 66.5,
+      "hoursFromNow": 64,
       "isUpcoming": false,
       "isPast": false
     },
@@ -788,7 +788,7 @@
       "forecast": "40.0",
       "previous": "38.4",
       "actual": null,
-      "hoursFromNow": 67,
+      "hoursFromNow": 64.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -800,7 +800,7 @@
       "forecast": "0.1%",
       "previous": "0.2%",
       "actual": null,
-      "hoursFromNow": 67.5,
+      "hoursFromNow": 65,
       "isUpcoming": false,
       "isPast": false
     },
@@ -812,7 +812,7 @@
       "forecast": null,
       "previous": "3.40|1.8",
       "actual": null,
-      "hoursFromNow": 67.6,
+      "hoursFromNow": 65,
       "isUpcoming": false,
       "isPast": false
     },
@@ -824,7 +824,7 @@
       "forecast": null,
       "previous": "3.68|3.3",
       "actual": null,
-      "hoursFromNow": 67.8,
+      "hoursFromNow": 65.3,
       "isUpcoming": false,
       "isPast": false
     },
@@ -836,7 +836,7 @@
       "forecast": null,
       "previous": "-4.5%",
       "actual": null,
-      "hoursFromNow": 68,
+      "hoursFromNow": 65.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -848,7 +848,7 @@
       "forecast": "205K",
       "previous": "197K",
       "actual": null,
-      "hoursFromNow": 71,
+      "hoursFromNow": 68.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -860,7 +860,7 @@
       "forecast": "0.7%",
       "previous": "0.8%",
       "actual": null,
-      "hoursFromNow": 71,
+      "hoursFromNow": 68.5,
       "isUpcoming": false,
       "isPast": false
     },
@@ -872,10 +872,34 @@
       "forecast": "2.1%",
       "previous": "2.3%",
       "actual": null,
-      "hoursFromNow": 71,
+      "hoursFromNow": 68.5,
+      "isUpcoming": false,
+      "isPast": false
+    },
+    {
+      "title": "Final Wholesale Inventories m/m",
+      "currency": "USD",
+      "impact": "Low",
+      "date": "2026-08-06T10:00:00-04:00",
+      "forecast": "0.3%",
+      "previous": "0.3%",
+      "actual": null,
+      "hoursFromNow": 70,
+      "isUpcoming": false,
+      "isPast": false
+    },
+    {
+      "title": "Natural Gas Storage",
+      "currency": "USD",
+      "impact": "Low",
+      "date": "2026-08-06T10:30:00-04:00",
+      "forecast": null,
+      "previous": "28B",
+      "actual": null,
+      "hoursFromNow": 70.5,
       "isUpcoming": false,
       "isPast": false
     }
   ],
-  "updated": "2026-08-03T13:28:43.278Z"
+  "updated": "2026-08-03T16:01:23.938Z"
 }
