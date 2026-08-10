@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-10T18:01:25.275Z",
+  "updated": "2026-08-10T19:00:26.686Z",
   "parisHour": 20,
   "weekend": false,
   "marketOpen": true,
@@ -15,7 +15,7 @@
     "XAUUSD": 4323.98
   },
   "fetchStats": {
-    "ohlcPairs": 6,
+    "ohlcPairs": 7,
     "newsCount": 0,
     "cotUpdated": false
   }
