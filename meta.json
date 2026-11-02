@@ -1,8 +1,8 @@
 {
-  "updated": "2026-11-02T16:40:48.091Z",
-  "parisHour": 17,
+  "updated": "2026-11-02T23:41:43.280Z",
+  "parisHour": 0,
   "weekend": false,
-  "marketOpen": true,
+  "marketOpen": false,
   "spots": {
     "EURUSD": 1.11839,
     "GBPUSD": 1.34009,
@@ -17,6 +17,6 @@
   "fetchStats": {
     "ohlcPairs": 7,
     "newsCount": 0,
-    "cotUpdated": true
+    "cotUpdated": false
   }
 }
